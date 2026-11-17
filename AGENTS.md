@@ -56,6 +56,7 @@ still use inline SVG emblems. The site is not yet published — the owner pushes
 index.html          the table: wordmark, the hand of cards, footer, inspect layer
 css/site.css        tokens, layout, cards, inspect view, responsive rules
 js/site.js          deals a card into the inspect view and back, tilts cards under the pointer
+DESIGN.md           the visual system: palette, type, geometry, motion, change recipes
 assets/             card screenshots, one cropped JPEG per tool
 AGENTS.md           this file
 .nojekyll           disables Jekyll on GitHub Pages
@@ -65,6 +66,10 @@ AGENTS.md           this file
 
 Do not add new directories or build configs for a page this size. `assets/` holds card
 art only, and only real images: no placeholder files, no sprites, no icons.
+
+`css/site.css` is the source of truth for colours, geometry, and timings; `DESIGN.md`
+explains them. When a token, a card size, a breakpoint, or a timing changes, update
+`DESIGN.md` in the same commit.
 
 ## 4. Content rules
 
