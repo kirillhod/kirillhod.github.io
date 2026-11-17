@@ -27,23 +27,18 @@
     const cardScale = Number.parseFloat(style.scale) || 1;
     const rotation = style.rotate;
 
-    // A phone thumbnail is much smaller than the inspect view and hides the note and the
-    // actions, so the clone cannot reuse its layout: it is laid out at the inspect size and
-    // starts scaled down onto the thumbnail instead.
-    const thumb = card.offsetWidth < to.width * 0.7;
-    const layoutW = thumb ? to.width : card.offsetWidth;
-    const layoutH = thumb ? to.height : card.offsetHeight;
-
     // The clone is laid out at the card's own size and reaches the inspect size by scale,
     // so the copy keeps the card's line breaks, padding and type.
-    node.style.setProperty("--cw", `${layoutW}px`);
-    node.style.setProperty("--ch", `${layoutH}px`);
+    node.style.setProperty("--cw", `${card.offsetWidth}px`);
+    node.style.setProperty("--ch", `${card.offsetHeight}px`);
     node.style.setProperty("--dx", `${from.left + from.width / 2 - (to.left + to.width / 2)}px`);
     node.style.setProperty("--dy", `${from.top + from.height / 2 - (to.top + to.height / 2)}px`);
-    node.style.setProperty("--k", String((card.offsetWidth * cardScale) / layoutW));
+    node.style.setProperty("--k", String(cardScale));
+    // Fit the inspect slot on both axes: at large text sizes a card can be taller than the
+    // slot's aspect ratio, and the height must not push it off screen.
     node.style.setProperty(
       "--k1",
-      String(thumb ? 1 : Math.min(to.width / card.offsetWidth, to.height / card.offsetHeight))
+      String(Math.min(to.width / card.offsetWidth, to.height / card.offsetHeight))
     );
     node.style.setProperty("--r0", rotation === "none" ? "0deg" : rotation);
     node.style.setProperty("--rx", style.getPropertyValue("--rx") || "0deg");

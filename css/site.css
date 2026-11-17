@@ -691,80 +691,38 @@ button:focus-visible {
   }
 }
 
-/* Phones: three thumbnails in one row, so the whole hand is visible and nothing scrolls.
-   The note and the actions would be unreadable at this size, so a thumbnail keeps the
-   number, the art and the name, and the card opens in the inspect view for the rest. */
+/* Phones: the hand runs down the page instead of across it. Each card takes the full column
+   width with its note and actions, the outer two lean a degree or so, and only the page
+   scrolls — nothing sideways. */
 
 @media (max-width: 30rem) {
   :root {
+    --card-w: min(74vw, 20rem);
     --hand-scale: 1;
   }
 
   .hand-wrap {
-    padding-block: 2rem;
+    padding-block: 1.25rem;
   }
 
   .hand {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    align-items: stretch;
-    gap: 0.45rem;
-    width: 100%;
-    padding-inline: 0.5rem;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding-inline: 1rem;
   }
 
   .hand .card {
-    width: auto;
-    min-height: 0;
-    aspect-ratio: var(--card-aspect);
-    margin: 0;
-    padding: 0.45rem;
-    gap: 0.35rem;
-    border-radius: 0.7rem;
-  }
-
-  .hand .card .card-head {
-    font-size: 0.46rem;
-    letter-spacing: 0.08em;
-  }
-
-  /* "Blender add-on" breaks into two lines at this width and reads as noise; the kind is
-     in the inspect view. */
-  .hand .card .card-kind {
-    display: none;
-  }
-
-  .hand .card .card-art {
-    padding: 0.25rem;
-  }
-
-  .hand .card .card-name {
-    font-size: 0.66rem;
-    line-height: 1.25;
-    letter-spacing: 0;
-  }
-
-  .hand .card .card-note,
-  .hand .card .card-actions {
-    display: none;
+    margin-inline: 0;
   }
 
   .hand .card:nth-child(1) {
-    --rot: -3deg;
-    --lift: 7px;
+    --rot: -1.5deg;
+    --lift: 0px;
   }
 
   .hand .card:nth-child(3) {
-    --rot: 3deg;
-    --lift: 7px;
-  }
-}
-
-@media (max-width: 22rem) {
-  /* At 320 px the palette title needs four lines, which does not fit a 5:7 thumbnail, so
-     the cards take their content height here instead of clipping the last line. */
-  .hand .card {
-    aspect-ratio: auto;
+    --rot: 1.5deg;
+    --lift: 0px;
   }
 }
 
