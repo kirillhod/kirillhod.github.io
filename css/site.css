@@ -748,6 +748,9 @@ button:focus-visible {
 
   .hand {
     flex-direction: row;
+    /* The rows are sized by their copy, so the cards stretch to the tallest one and stay
+       the same size. */
+    align-items: stretch;
     padding-inline: 0.5rem;
   }
 
