@@ -1,5 +1,5 @@
 :root {
-  color-scheme: dark light;
+  color-scheme: dark;
 
   --bg: #0b0d10;
   --fg: #f5f7fa;
@@ -7,16 +7,6 @@
   --line: #1e232b;
   --accent: #6ea8fe;
   --measure: 44rem;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #fbfbfa;
-    --fg: #14171c;
-    --muted: #61676f;
-    --line: #e4e4e0;
-    --accent: #1a56db;
-  }
 }
 
 *,
@@ -102,13 +92,19 @@ a:focus-visible {
 
 .project-extra {
   flex: 0 0 auto;
+  padding: 0.28rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 0.35rem;
   color: var(--accent);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
   text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .project-extra:hover {
-  text-decoration: underline;
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 /* Footer */

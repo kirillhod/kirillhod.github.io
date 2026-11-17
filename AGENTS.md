@@ -37,7 +37,7 @@ owner pushes.
    external link. Project data is hand-written markup, not fetched.
 3. **Static hosting.** `index.html` stays in the repository root and `.nojekyll` must
    exist. The site must work identically opened from disk (`file://`) and served from
-   Pages. Both themes and every link work offline.
+   Pages. The site is dark-only; every link works offline.
 4. **Relative asset paths** (`css/site.css`, never `/css/site.css`) so the site also works
    under a subpath.
 5. **External links** carry `rel="noopener noreferrer"` when they open a new context.
@@ -70,8 +70,9 @@ an `assets/` directory only when real images exist.
   and the footer GitHub link. No about section, taglines, calls to action, statistics, or
   marketing sections. If a fact can be dropped without losing meaning, drop it.
 - One entry per public tool, ordered by relevance, not alphabetically.
-- An entry holds: name, one-line note, source link, plus a demo link only when a public
-  demo exists.
+- An entry holds: name, one-line note, and a source link. Add an `Open` action only when
+  the tool runs on the web. Label actions by what they open — `Open` for a live tool,
+  `Source` for a repository — and never call a finished tool a demo.
 - Describe what the tool does for the user. No superlatives, no marketing voice, no
   invented facts — shorten the repository README.
 - Keep the notes in sync with the repositories; update them when a project's scope
@@ -83,8 +84,9 @@ an `assets/` directory only when real images exist.
 - Formatting: 2 spaces, double quotes in HTML attributes, single quotes in JS,
   semicolons, ~100 columns, UTF-8, LF.
 - Files: `kebab-case`. Functions: `camelCase`. Constants: `SCREAMING_SNAKE_CASE`.
-- CSS: every color, radius, and spacing token lives in `:root`; light theme is an
-  override inside `@media (prefers-color-scheme: light)`; `color-scheme` stays declared.
+- CSS: every color, radius, and spacing token lives in `:root`; the site is dark-only
+  (`color-scheme: dark`). No light theme, no `prefers-color-scheme` override, no theme
+  toggle.
   No hard-coded hex in component rules, no inline `style` attributes, no `!important`.
 - JavaScript only when a feature genuinely needs it (progressive enhancement). When used:
   native ES modules, named exports only, `const` over `let`, `===`, no `innerHTML` with
@@ -93,8 +95,8 @@ an `assets/` directory only when real images exist.
 
 ## 6. Accessibility
 
-Target WCAG 2.2 AA. Text contrast at least 4.5:1 in both themes, visible focus on every
-interactive element, full keyboard operation in DOM order, `prefers-reduced-motion`
+Target WCAG 2.2 AA. Text contrast at least 4.5:1 against the dark background, visible focus
+on every interactive element, full keyboard operation in DOM order, `prefers-reduced-motion`
 respected, no information conveyed by color alone, layout holds at 200% text zoom.
 
 ## 7. Verification
@@ -102,7 +104,8 @@ respected, no information conveyed by color alone, layout holds at 200% text zoo
 There is no test suite; verification is manual and must be reported with what was checked.
 
 - Open `index.html` from disk and through a local server (`python -m http.server`).
-- Check 360 px, 768 px, and 1280 px widths; keyboard-only pass; both color schemes.
+- Check 360 px, 768 px, and 1280 px widths; keyboard-only pass; confirm the palette stays
+  dark whatever the system setting is.
 - Confirm no console errors, no network requests besides navigation, and that every link
   resolves to a real page.
 - "Should work" is not verification.
@@ -121,8 +124,8 @@ There is no test suite; verification is manual and must be reported with what wa
 
 ## 9. Definition of done
 
-A change is done when the page still loads from disk and from Pages, both themes and
-narrow widths hold, keyboard and focus states work, no dependency/build/network was
+A change is done when the page still loads from disk and from Pages, the layout holds at
+narrow widths, keyboard and focus states work, no dependency/build/network was
 added, links still point at real projects, copy matches the repositories, and the change
 is committed locally with a descriptive body.
 
