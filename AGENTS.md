@@ -121,6 +121,8 @@ There is no test suite; verification is manual and must be reported with what wa
   cards with their notes and actions, and only the page scrolls — nothing sideways. Between
   30 and 56 rem the hand is a strip you swipe: the next card must peek in, the strip must
   reach the last card without snapping back, and the page itself must not scroll sideways.
+  On a landscape phone, below 60 rem wide and 34 rem tall, the three cards fit one row sized
+  by the screen height with the note left to the inspect view; nothing may scroll.
 - Open every card: it must fly to the centre, dim the hand, and take focus; `Esc`, the
   close button, and a click outside must bring it back and return focus to the card. The
   clone must match the card on the first frame and the slot on the last — same box, same
