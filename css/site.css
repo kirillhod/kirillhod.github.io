@@ -1,12 +1,48 @@
 :root {
   color-scheme: dark;
 
-  --bg: #0b0d10;
-  --fg: #f5f7fa;
-  --muted: #8b929c;
-  --line: #1e232b;
-  --accent: #6ea8fe;
-  --measure: 44rem;
+  /* Surfaces */
+  --bg: #09080c;
+  --glow: #1d1529;
+  --glow-low: #150f1e;
+  --surface: #14111b;
+  --surface-top: #1d1827;
+  --surface-low: #100d16;
+  --art-bed: #0b0910;
+
+  /* Ink */
+  --fg: #f3eff8;
+  --muted: #9c94a9;
+  --line: #2b2436;
+  --line-soft: #ffffff0f;
+  --line-strong: #4c405e;
+
+  /* Accent */
+  --gold: #dcb56c;
+  --gold-line: #dcb56c59;
+  --gold-wash: #dcb56c14;
+  --gold-wash-strong: #dcb56c26;
+
+  /* Card art tints */
+  --art-palette: #8fc3b1;
+  --art-node-atlas: #c0a4e6;
+  --art-sprites: #e2a184;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+
+  /* Cards: one size for the hand, one for the inspect view */
+  --card-w: clamp(15rem, min(30vw, 46vh), 21rem);
+  --card-aspect: 5 / 7;
+  --hand-scale: 0.84;
+  --inspect-w: min(22rem, 92vw, 56vh);
+
+  --radius-card: 0.95rem;
+  --radius-ui: 0.4rem;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 0.24s;
+  --dur-fly: 0.44s;
 }
 
 *,
@@ -20,98 +56,117 @@ html {
 }
 
 body {
-  margin: 0 auto;
-  width: 100%;
-  max-width: var(--measure);
-  padding: 3.5rem 1.25rem 2.5rem;
-  background: var(--bg);
+  margin: 0;
+  background:
+    radial-gradient(75% 55% at 50% 34%, var(--glow), transparent 70%),
+    radial-gradient(120% 60% at 50% 108%, var(--glow-low), transparent 62%),
+    var(--bg);
   color: var(--fg);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
-a {
+a,
+button {
   color: inherit;
-  text-decoration-color: var(--line);
-  text-underline-offset: 0.2em;
 }
 
-a:focus-visible {
-  outline: 2px solid var(--accent);
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--gold);
   outline-offset: 3px;
   border-radius: 0.2rem;
 }
 
+/* Table */
+
+.table {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1.5rem clamp(1rem, 4vw, 2.5rem) 1.25rem;
+}
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--line);
+}
+
 .wordmark {
-  margin: 0 0 3rem;
-  font-size: 0.95rem;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
   font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.deck {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.stage {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  padding-block: 1rem;
+}
+
+.hand-wrap {
+  display: flex;
+  /* `safe` keeps the hand centred while it fits and falls back to the start when it does
+     not, so an overflowing first card stays reachable. The plain keyword is the fallback
+     for engines without it. */
+  justify-content: center;
+  justify-content: safe center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 2rem;
+  scrollbar-width: none;
+}
+
+.hand-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.hand {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  /* The fan rotation pushes the outer corners past the card boxes; this padding keeps that
+     overhang inside the scroll area instead of clipping it at the edge of the table. */
+  padding: 0 1rem;
+  list-style: none;
+}
+
+.bottombar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
-/* Projects */
-
-.projects {
+.hint {
   margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--line);
-}
-
-.project {
-  display: flex;
-  align-items: baseline;
-  gap: 1rem;
-  padding: 1.1rem 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.project-main {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 0.2rem;
-  text-decoration: none;
-}
-
-.project-name {
-  font-size: 1.05rem;
-  font-weight: 550;
-}
-
-.project-note {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.project-main:hover .project-name {
-  color: var(--accent);
-}
-
-.project-extra {
-  flex: 0 0 auto;
-  padding: 0.28rem 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  border-radius: 0.35rem;
-  color: var(--accent);
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.project-extra:hover {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-}
-
-/* Footer */
-
-.site-footer {
-  margin-top: 3rem;
-  font-size: 0.8rem;
 }
 
 .handle {
@@ -123,12 +178,472 @@ a:focus-visible {
   color: var(--fg);
 }
 
-@media (max-width: 26rem) {
-  body {
-    padding-top: 2.5rem;
+/* Card */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: var(--card-w);
+  aspect-ratio: var(--card-aspect);
+  padding: 0.9rem 0.9rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: linear-gradient(168deg, var(--surface-top), var(--surface) 48%, var(--surface-low));
+  box-shadow:
+    0 26px 50px -26px #000000e6,
+    0 1px 0 #ffffff0d inset;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0.32rem;
+  border: 1px solid var(--line-soft);
+  border-radius: calc(var(--radius-card) - 0.3rem);
+  pointer-events: none;
+}
+
+/* Glare that follows the pointer. The custom properties are set by js/site.js. */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    60% 45% at var(--mx, 50%) var(--my, 0%),
+    #ffffff16,
+    transparent 72%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.card[data-card="palette"] {
+  --art: var(--art-palette);
+}
+
+.card[data-card="node-atlas"] {
+  --art: var(--art-node-atlas);
+}
+
+.card[data-card="sprites"] {
+  --art: var(--art-sprites);
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card-index {
+  color: var(--gold);
+}
+
+.card-art {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  aspect-ratio: 8 / 5;
+  padding: 0.55rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 0.5rem;
+  background:
+    radial-gradient(120% 100% at 50% 0%, color-mix(in srgb, var(--art) 16%, transparent), transparent 72%),
+    var(--art-bed);
+  color: var(--art);
+  overflow: hidden;
+}
+
+.card-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* A tool that has a real screenshot fills the window edge to edge instead of sitting in
+   it. The images are cut to 8:5, so the shared aspect ratio keeps every window identical. */
+.card-art-shot {
+  position: relative;
+  padding: 0;
+  border-color: var(--line);
+  background: var(--art-bed);
+}
+
+.card-art-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A hairline over the image keeps the window reading as part of the card, not as a hole. */
+.card-art-shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 1px 0 var(--line-soft) inset;
+  pointer-events: none;
+}
+
+.card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.card-name {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 620;
+  line-height: 1.2;
+  letter-spacing: -0.006em;
+  text-wrap: balance;
+}
+
+.card-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.card-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 0.45rem;
+  pointer-events: none;
+}
+
+.action {
+  display: grid;
+  place-items: center;
+  flex: 1 1 0;
+  min-height: 2rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-ui);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  pointer-events: auto;
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.action:hover {
+  border-color: var(--line-strong);
+  background: #ffffff0a;
+  color: var(--fg);
+}
+
+.action-primary {
+  border-color: var(--gold-line);
+  background: var(--gold-wash);
+  color: var(--gold);
+}
+
+.action-primary:hover {
+  border-color: var(--gold);
+  background: var(--gold-wash-strong);
+  color: var(--gold);
+}
+
+.card-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.card-hit:focus-visible {
+  border-radius: var(--radius-card);
+  outline-offset: -4px;
+}
+
+.no-js .card-hit {
+  display: none;
+}
+
+/* Hand */
+
+.hand .card {
+  flex: 0 0 auto;
+  margin-inline: -1rem;
+  rotate: var(--rot, 0deg);
+  translate: 0 var(--lift, 0);
+  scale: var(--hand-scale);
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  animation: deal 520ms cubic-bezier(0.2, 0.9, 0.25, 1.04) backwards;
+  transition:
+    rotate var(--dur) var(--ease),
+    translate var(--dur) var(--ease),
+    scale var(--dur) var(--ease),
+    transform 140ms var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    opacity 0.3s var(--ease);
+}
+
+@keyframes deal {
+  from {
+    opacity: 0;
+    translate: 0 1.5rem;
+    rotate: calc(var(--rot, 0deg) * 1.8);
+    scale: calc(var(--hand-scale) * 0.88);
   }
 
-  .wordmark {
-    margin-bottom: 2rem;
+  to {
+    opacity: 1;
+    translate: 0 var(--lift, 0);
+    rotate: var(--rot, 0deg);
+    scale: var(--hand-scale);
+  }
+}
+
+.hand .card:nth-child(1) {
+  --rot: -7deg;
+  --lift: 12px;
+  z-index: 1;
+  animation-delay: 40ms;
+}
+
+.hand .card:nth-child(2) {
+  --rot: 0deg;
+  --lift: 0px;
+  z-index: 2;
+  animation-delay: 130ms;
+}
+
+.hand .card:nth-child(3) {
+  --rot: 7deg;
+  --lift: 12px;
+  z-index: 3;
+  animation-delay: 220ms;
+}
+
+@media (hover: hover) {
+  .hand:hover .card:not(:hover) {
+    opacity: 0.84;
+  }
+
+  .hand .card:hover {
+    rotate: 0deg;
+    translate: 0 calc(var(--lift) - 14px);
+    scale: calc(var(--hand-scale) + 0.025);
+    border-color: var(--line-strong);
+    box-shadow:
+      0 34px 60px -28px #000000f2,
+      0 0 0 1px var(--gold-wash-strong),
+      0 1px 0 #ffffff14 inset;
+    z-index: 6;
+  }
+
+  .hand .card:hover::after {
+    opacity: 1;
+  }
+}
+
+.hand.is-inspecting .card {
+  opacity: 0.22;
+}
+
+.hand .card.is-source {
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Inspect view */
+
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.veil[hidden] {
+  display: none;
+}
+
+.veil-scrim {
+  position: absolute;
+  inset: 0;
+  background: #050409c4;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity var(--dur-fly) var(--ease);
+}
+
+.veil.is-open .veil-scrim {
+  opacity: 1;
+}
+
+.veil-slot {
+  position: relative;
+  width: var(--inspect-w);
+  aspect-ratio: var(--card-aspect);
+}
+
+.veil-hand {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.veil-card {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  aspect-ratio: auto;
+  translate: var(--dx, 0) var(--dy, 0);
+  rotate: var(--r0, 0deg);
+  scale: var(--k, var(--hand-scale));
+  box-shadow:
+    0 44px 90px -34px #000000f5,
+    0 0 0 1px var(--gold-wash-strong),
+    0 1px 0 #ffffff14 inset;
+  transition:
+    translate var(--dur-fly) var(--ease),
+    rotate var(--dur-fly) var(--ease),
+    scale var(--dur-fly) var(--ease);
+}
+
+.veil.is-open .veil-card {
+  translate: 0 0;
+  rotate: 0deg;
+  scale: 1;
+}
+
+.veil-close {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.85rem);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-ui);
+  background: var(--surface-low);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.veil-close:hover {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+
+.veil-key {
+  padding: 0.05rem 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font: inherit;
+  letter-spacing: 0.08em;
+}
+
+.veil-hint {
+  position: absolute;
+  top: calc(100% + 0.85rem);
+  right: 0;
+  left: 0;
+  z-index: 2;
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Narrow screens: the hand becomes a swipeable row */
+
+@media (max-width: 56rem) {
+  :root {
+    --card-w: min(80vw, 20rem);
+    --hand-scale: 0.92;
+  }
+
+  .table {
+    padding: 1rem 1rem 0.9rem;
+  }
+
+  .hand-wrap {
+    padding-block: 1.5rem;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1rem;
+  }
+
+  .hand .card {
+    margin-inline: 0.4rem;
+    scroll-snap-align: center;
+  }
+
+  .hand .card:nth-child(1) {
+    --rot: -2deg;
+    --lift: 0px;
+  }
+
+  .hand .card:nth-child(3) {
+    --rot: 2deg;
+    --lift: 0px;
+  }
+}
+
+@media (max-width: 22rem) {
+  :root {
+    --card-w: 86vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hand .card {
+    animation: none;
+  }
+
+  .hand .card,
+  .veil-scrim,
+  .veil-card,
+  .action,
+  .veil-close {
+    transition: none;
   }
 }

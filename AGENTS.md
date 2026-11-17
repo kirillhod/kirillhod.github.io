@@ -11,9 +11,9 @@ personal page: no name, photo, bio, or contact details. Plain HTML, CSS, and Jav
 only; no framework, no build step, no backend, no accounts, no analytics. The repository
 root *is* the site.
 
-**Status:** MVP. Minimal English content and a neutral layout are in place; the visual
-direction (game-interface styling) is still open. The site is not yet published — the
-owner pushes.
+**Status:** the card-table layout is in place: the tools are dealt as cards and one card
+opens into a centred inspect view. The palette tool shows a real screenshot; the other two
+still use inline SVG emblems. The site is not yet published — the owner pushes.
 
 **Agreed identifiers** (do not rename without approval):
 
@@ -25,6 +25,7 @@ owner pushes.
 | GitHub link | `github.com/kirillhod`, discreet, footer only |
 | UI language | English |
 | Stylesheet | `css/site.css` |
+| Script | `js/site.js` |
 | Deploy | GitHub Pages, branch `main`, folder `/ (root)` |
 
 ## 2. Hard rules
@@ -52,16 +53,18 @@ owner pushes.
 ## 3. Layout
 
 ```text
-index.html          the whole page: wordmark, project list, footer
-css/site.css        tokens, layout, components, responsive rules
+index.html          the table: wordmark, the hand of cards, footer, inspect layer
+css/site.css        tokens, layout, cards, inspect view, responsive rules
+js/site.js          deals a card into the inspect view and back, tilts cards under the pointer
+assets/             card screenshots, one cropped JPEG per tool
 AGENTS.md           this file
 .nojekyll           disables Jekyll on GitHub Pages
 .gitignore          OS/editor junk, logs, env
 .gitattributes      LF line endings, UTF-8 text
 ```
 
-Do not add new directories, build configs, or asset pipelines for a page this size. Add
-an `assets/` directory only when real images exist.
+Do not add new directories or build configs for a page this size. `assets/` holds card
+art only, and only real images: no placeholder files, no sprites, no icons.
 
 ## 4. Content rules
 
@@ -70,9 +73,14 @@ an `assets/` directory only when real images exist.
   and the footer GitHub link. No about section, taglines, calls to action, statistics, or
   marketing sections. If a fact can be dropped without losing meaning, drop it.
 - One entry per public tool, ordered by relevance, not alphabetically.
-- An entry holds: name, one-line note, and a source link. Add an `Open` action only when
-  the tool runs on the web. Label actions by what they open — `Open` for a live tool,
-  `Source` for a repository — and never call a finished tool a demo.
+- An entry holds: a two-digit position (`01`), a kind label (`Web app`, `Blender add-on`),
+  the name, a one-line note, and actions. Add an `Open` action only when the tool runs on
+  the web. Label actions by what they open — `Open` for a live tool, `Source` for a
+  repository — and never call a finished tool a demo.
+- Card art is a real screenshot when the tool has one: a `720 × 450` JPEG cropped to `8 / 5`
+  in `assets/`, `alt=""`, filling the window edge to edge. Until then, an inline SVG
+  emblem, `aria-hidden`, one emblem per tool, all on the same `120 × 84` viewBox so the
+  cards keep their proportions. Both sit in the same fixed window, so the cards stay equal.
 - Describe what the tool does for the user. No superlatives, no marketing voice, no
   invented facts — shorten the repository README.
 - Keep the notes in sync with the repositories; update them when a project's scope
@@ -88,9 +96,10 @@ an `assets/` directory only when real images exist.
   (`color-scheme: dark`). No light theme, no `prefers-color-scheme` override, no theme
   toggle.
   No hard-coded hex in component rules, no inline `style` attributes, no `!important`.
-- JavaScript only when a feature genuinely needs it (progressive enhancement). When used:
-  native ES modules, named exports only, `const` over `let`, `===`, no `innerHTML` with
-  dynamic strings, no inline event handlers.
+- JavaScript only when a feature genuinely needs it (progressive enhancement). It ships as
+  one classic script, not an ES module: Chrome refuses `type="module"` over `file://` and
+  the page must work from disk. `const` over `let`, `===`, no `innerHTML` with dynamic
+  strings, no inline event handlers, one IIFE per file.
 - Comments explain *why*, not *what*. No dead code and no TODOs without an issue.
 
 ## 6. Accessibility
@@ -106,6 +115,9 @@ There is no test suite; verification is manual and must be reported with what wa
 - Open `index.html` from disk and through a local server (`python -m http.server`).
 - Check 360 px, 768 px, and 1280 px widths; keyboard-only pass; confirm the palette stays
   dark whatever the system setting is.
+- Open every card: it must fly to the centre, dim the hand, and take focus; `Esc`, the
+  close button, and a click outside must bring it back and return focus to the card.
+- Repeat the pass with JavaScript disabled and with `prefers-reduced-motion` forced.
 - Confirm no console errors, no network requests besides navigation, and that every link
   resolves to a real page.
 - "Should work" is not verification.
@@ -131,7 +143,10 @@ is committed locally with a descriptive body.
 
 ## 10. Adding a project
 
-1. Copy an existing `<li class="project">` block and place it by relevance.
-2. Fill in the name and a one-line note shortened from the repository README.
-3. Link the repository, plus the demo URL only if it exists and loads.
-4. Run the verification list, then commit.
+1. Copy an existing `<li class="card" data-card="…">` block and place it by relevance.
+2. Set the position, the kind label, the name, and a one-line note shortened from the
+   repository README.
+3. Give the card its tint in `css/site.css` and draw a placeholder emblem in the art window.
+4. Link the repository, plus the live tool only if it exists and loads.
+5. Give the inspect button an `aria-label` that names the tool.
+6. Run the verification list, then commit.
