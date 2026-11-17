@@ -146,8 +146,11 @@
 
   // Cards tilt away from the pointer, like a card pressed at the cursor: the side under
   // the pointer sinks and the opposite edge comes up. The anchor rectangle is taken once
-  // per hover so the tilt does not feed back into its own measurements. On a touch screen
-  // the same tilt follows a finger, but only where the hand does not scroll sideways.
+  // per hover so the tilt does not feed back into its own measurements.
+  //
+  // A finger tilts through touch events, not pointer events: as soon as a phone decides a
+  // drag is a scroll it cancels the pointer stream, while touchmove keeps arriving through
+  // the scroll. This is why the card responds under a finger at all.
   const TILT_X = 8;
   const TILT_Y = 10;
   const DRAG_PX = 6;
@@ -159,10 +162,12 @@
     let frame = 0;
     let anchor = null;
     let point = null;
-    let pressed = false;
     let dragged = false;
     let startX = 0;
     let startY = 0;
+    let startRect = null;
+    let startScrollX = 0;
+    let startScrollY = 0;
 
     const settle = () => {
       card.style.setProperty("--rx", "0deg");
@@ -192,52 +197,78 @@
       card.style.setProperty("--my", `${((ny + 0.5) * 100).toFixed(1)}%`);
     };
 
+    // The page can scroll under a finger that stays on the card, so the rect taken at
+    // touchstart is moved by the scroll instead of read again: a fresh rect would include
+    // the tilt and feed back into the next frame.
+    const fingerAnchor = () => ({
+      left: startRect.left - (window.scrollX - startScrollX),
+      top: startRect.top - (window.scrollY - startScrollY),
+      width: startRect.width,
+      height: startRect.height
+    });
+
+    // A tap stays flat, so the card it opens is measured cleanly; once the finger moves
+    // past DRAG_PX the card leans under it, and touchend marks the drag to drop the click.
+    card.addEventListener(
+      "touchstart",
+      (event) => {
+        if (event.touches.length !== 1) return;
+        dragged = false;
+        delete card.dataset.dragged;
+        if (reducedMotion.matches || handPans()) return;
+        const touch = event.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        startRect = card.getBoundingClientRect();
+        startScrollX = window.scrollX;
+        startScrollY = window.scrollY;
+      },
+      { passive: true }
+    );
+
+    card.addEventListener(
+      "touchmove",
+      (event) => {
+        if (!startRect || reducedMotion.matches || event.touches.length !== 1) return;
+        const touch = event.touches[0];
+        if (Math.hypot(touch.clientX - startX, touch.clientY - startY) <= DRAG_PX) return;
+        dragged = true;
+        anchor = fingerAnchor();
+        point = { x: touch.clientX, y: touch.clientY };
+        if (!frame) frame = window.requestAnimationFrame(paint);
+      },
+      { passive: true }
+    );
+
+    card.addEventListener("touchend", () => {
+      if (!startRect) return;
+      startRect = null;
+      if (dragged) card.dataset.dragged = "yes";
+      stop();
+    });
+
+    card.addEventListener("touchcancel", () => {
+      startRect = null;
+      stop();
+    });
+
+    // Mouse and pen keep the hover tilt, anchored once per hover.
     card.addEventListener("pointerenter", (event) => {
-      if (event.pointerType !== "mouse" || reducedMotion.matches) return;
+      if (event.pointerType === "touch" || reducedMotion.matches) return;
       anchor = card.getBoundingClientRect();
       point = { x: event.clientX, y: event.clientY };
       paint();
     });
 
-    card.addEventListener("pointerdown", (event) => {
-      if (event.pointerType === "mouse" || reducedMotion.matches || handPans()) return;
-      pressed = true;
-      dragged = false;
-      startX = event.clientX;
-      startY = event.clientY;
-      anchor = card.getBoundingClientRect();
-      delete card.dataset.dragged;
-    });
-
     card.addEventListener("pointermove", (event) => {
-      if (reducedMotion.matches) return;
-      if (event.pointerType !== "mouse" && !pressed) return;
+      if (event.pointerType === "touch" || reducedMotion.matches) return;
       if (!anchor) anchor = card.getBoundingClientRect();
-      // A tap stays flat; only a real drag starts the tilt, so the card does not flicker
-      // before it flies into the inspect view.
-      if (event.pointerType !== "mouse") {
-        if (Math.hypot(event.clientX - startX, event.clientY - startY) <= DRAG_PX) return;
-        dragged = true;
-      }
       point = { x: event.clientX, y: event.clientY };
       if (!frame) frame = window.requestAnimationFrame(paint);
     });
 
-    card.addEventListener("pointerup", (event) => {
-      if (event.pointerType === "mouse" || !pressed) return;
-      pressed = false;
-      if (dragged) card.dataset.dragged = "yes";
-      stop();
-    });
-
-    card.addEventListener("pointercancel", () => {
-      if (!pressed) return;
-      pressed = false;
-      stop();
-    });
-
     card.addEventListener("pointerleave", (event) => {
-      if (event.pointerType !== "mouse") return;
+      if (event.pointerType === "touch") return;
       stop();
     });
   });

@@ -141,7 +141,8 @@ Measured, for reference:
 |---|---|
 | Rest | Fan: card 1 `-9deg` and 34 px low, card 2 flat, card 3 `+9deg` and 34 px low; hand scale 0.88 |
 | Hover (`.hand .card:hover`, hover-capable only) | Rotation to 0, up 14 px, scale +0.025, stronger border, deeper shadow, gold halo, pointer glare on (`::after` opacity 1); the other cards fall to `opacity: 0.84`; `z-index: 6` |
-| Pointer tilt | `transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry))` from `js/site.js`: up to `±10deg` around Y and `±8deg` around X, away from the pointer; glare centre follows `--mx/--my` |
+| Pointer tilt (mouse, pen) | `transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry))` from `js/site.js`: up to `±10deg` around Y and `±8deg` around X, away from the pointer; glare centre follows `--mx/--my` |
+| Finger tilt (touch) | Rides touch events, not pointer events: a phone cancels the pointer stream as soon as it decides the drag is a scroll. After 6 px of movement the card leans under the finger; the anchor moves with the page scroll so the lean does not swing while scrolling; a tap stays flat, and a drag drops the click |
 | Focus-visible | `2px --gold` outline, offset 3 px; the card's hit button puts the ring inside the card (`-4px`) so it follows the rounded edge |
 | Active / pressed | Border to `--line-strong` only — the box must not move, because the flight measures it |
 | Inspecting | `.hand.is-inspecting` drops every card to `opacity: 0.22`; the source card gets `.is-source` (`visibility: hidden`) so the clone is the only visible copy |
@@ -226,8 +227,9 @@ Notes:
 - Full keyboard path: card hit buttons are real buttons in DOM order, the veil is a
   `role="dialog" aria-modal="true"` with the tool name as its label, `.table` is `inert` while
   open, `Esc` and the close button both return focus to the card.
-- Touch: `touch-action: manipulation`, own pressed states, no tap highlight; a drag over 6 px
-  tilts without opening (the click is suppressed).
+- Touch: `touch-action: manipulation`, own pressed states, no tap highlight. A finger that
+  moves past 6 px leans the card and the click is dropped; a tap never tilts, so the card it
+  opens is measured flat. The strip is the exception: a finger there pans the hand instead.
 - `prefers-reduced-motion` removes the deal and every transition; nothing is announced or
   required by an animation.
 - Layout holds at 200% text zoom because sizes are rem and the card grows with its content.
@@ -259,7 +261,9 @@ dark-only palette, the 5:7 card, the order of `Open`/`Download` then `Source`.
 - Landscape inspect starts with the note visible, so the clone begins taller than the card
   and grows out of its centre.
 - The tilt is a mouse hover plus a deliberate finger drag; a plain tap never tilts, so the
-  card does not flinch before it flies.
+  card does not flinch before it flies. On touch the tilt listens to touch events because
+  the pointer stream is cancelled once the phone starts scrolling, and a drag that scrolls
+  the page keeps leaning the card until the finger lifts.
 
 ## 12. Verification
 
