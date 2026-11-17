@@ -137,10 +137,10 @@ There is no test suite; verification is manual and must be reported with what wa
 - Open every card: it must fly to the centre, dim the hand, and take focus; `Esc`, the
   close button, and a click outside must bring it back and return focus to the card. The
   clone must match the card on the first frame and the slot on the last — same box, same
-  line breaks, only the scale changing — or the flight jumps at both ends. The idle sway
-  puts the clone within about 2 px of the card, which the flight covers; more is a jump. The
-  close button and the hint leave on the first frame of the return, and the way back is
-  shorter than the way in.
+  line breaks, only the scale changing — or the flight jumps at both ends. The clone reads
+  the card's sway rotation as well as its fan angle, so it starts on the card; more than
+  about 2 px of offset is a jump. The close button and the hint leave on the first frame of
+  the return, and the way back is shorter than the way in.
 - Repeat the pass with JavaScript disabled and with `prefers-reduced-motion` forced.
 - Confirm no console errors, no network requests besides navigation, and that every link
   resolves to a real page.

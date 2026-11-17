@@ -25,7 +25,13 @@
 
     const style = getComputedStyle(card);
     const cardScale = Number.parseFloat(style.scale) || 1;
-    const rotation = style.rotate;
+
+    // A card's visual rotation is the fan angle plus whatever the sway has turned it by at
+    // this instant, and the sway lives in the transform. Taking both means the clone starts
+    // on the card even when the sway is at its widest, instead of a few degrees away.
+    const fanAngle = Number.parseFloat(style.rotate) || 0;
+    const swayMatrix = new DOMMatrixReadOnly(style.transform === "none" ? "" : style.transform);
+    const swayAngle = (Math.atan2(swayMatrix.m12, swayMatrix.m11) * 180) / Math.PI;
 
     // A compact card hides the note to fit a short landscape screen, so its box is shorter
     // than the copy the inspect view shows. The clone is laid out at the slot width with its
@@ -46,7 +52,7 @@
       "--k1",
       compact ? "1" : String(Math.min(to.width / card.offsetWidth, to.height / card.offsetHeight))
     );
-    node.style.setProperty("--r0", rotation === "none" ? "0deg" : rotation);
+    node.style.setProperty("--r0", `${(fanAngle + swayAngle).toFixed(3)}deg`);
     node.style.setProperty("--rx", style.getPropertyValue("--rx") || "0deg");
     node.style.setProperty("--ry", style.getPropertyValue("--ry") || "0deg");
   };

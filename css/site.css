@@ -490,8 +490,8 @@ button:focus-visible {
 .hand .card:nth-child(1) {
   --rot: -9deg;
   --lift: 34px;
-  --sway-angle: 0.55deg;
-  --sway-shift: 1.5px;
+  --sway-angle: 1.65deg;
+  --sway-shift: 4.5px;
   --sway-time: 23s;
   --sway-phase: -7s;
   z-index: 1;
@@ -501,8 +501,8 @@ button:focus-visible {
 .hand .card:nth-child(2) {
   --rot: 0deg;
   --lift: 0px;
-  --sway-angle: 0.42deg;
-  --sway-shift: 1.1px;
+  --sway-angle: 1.26deg;
+  --sway-shift: 3.3px;
   --sway-time: 29s;
   --sway-phase: -19s;
   z-index: 2;
@@ -512,8 +512,8 @@ button:focus-visible {
 .hand .card:nth-child(3) {
   --rot: 9deg;
   --lift: 34px;
-  --sway-angle: -0.6deg;
-  --sway-shift: 1.4px;
+  --sway-angle: -1.8deg;
+  --sway-shift: 4.2px;
   --sway-time: 31s;
   --sway-phase: -12s;
   z-index: 3;

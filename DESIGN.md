@@ -140,7 +140,7 @@ Measured, for reference:
 | State | What changes |
 |---|---|
 | Rest | Fan: card 1 `-9deg` and 34 px low, card 2 flat, card 3 `+9deg` and 34 px low; hand scale 0.88 |
-| Idle sway | Every card drifts and turns on its own slow path: 0.42–0.6deg of rotation, 1.1–1.5 px of drift, periods of 23 / 29 / 31 s, started from negative delays. The five stops sit at uneven intervals so the motion has no beat. The pose freezes where it is on hover and while a card is inspected, and is gone under reduced motion |
+| Idle sway | Every card drifts and turns on its own slow path: 1.26–1.8deg of rotation, 3.3–4.5 px of drift, periods of 23 / 29 / 31 s, started from negative delays. The five stops sit at uneven intervals so the motion has no beat. The pose freezes where it is on hover and while a card is inspected, and is gone under reduced motion |
 | Hover (`.hand .card:hover`, hover-capable only) | Rotation to 0, up 14 px, scale +0.025, stronger border, deeper shadow, gold halo, pointer glare on (`::after` opacity 1); the other cards fall to `opacity: 0.84`; `z-index: 6` |
 | Pointer tilt (mouse, pen) | `transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry))` from `js/site.js`: up to `±10deg` around Y and `±8deg` around X, away from the pointer; glare centre follows `--mx/--my` |
 | Finger tilt (touch) | Rides touch events, not pointer events: a phone cancels the pointer stream as soon as it decides the drag is a scroll. After 6 px of movement the card leans under the finger; the anchor moves with the page scroll so the lean does not swing while scrolling; a tap stays flat, and a drag drops the click |
@@ -183,12 +183,17 @@ line breaks, padding and type survive the trip.
 | `--dx`, `--dy` | centre-to-centre offset from the slot to the card |
 | `--k` | start scale: the card's effective scale (`style.scale`) |
 | `--k1` | end scale: `min(slot.width / card.width, slot.height / card.height)` |
-| `--r0`, `--rx`, `--ry` | the card's fan rotation and tilt, carried in and cancelled at the end |
+| `--r0`, `--rx`, `--ry` | the card's rotation at that instant — fan angle plus the sway's — and its tilt, carried in and cancelled at the end |
 | `--dur-fly`, `--dur-back` | 0.44 s in, 0.28 s back |
 
 The clone is positioned at the slot centre with percentage translate
 (`calc(-50% + var(--dx))`), so it needs no known height. `.veil.is-open` moves it to
 `-50% -50%`, rotation 0, scale `--k1`.
+
+The sway turns the card inside its transform, so `alignToCard` reads the angle out of the
+computed matrix and adds it to the fan rotation for `--r0`. Without that the clone would
+start as much as 1.8deg away from a card at the top of its sway, which reads as a jump on
+the first frame now that the sway is wide.
 
 Landscape is the exception: compact cards hide the note, so their box is shorter than the copy
 the inspect view shows. There the clone is laid out at the slot width with `--ch: auto`, and
@@ -258,7 +263,7 @@ Notes:
 | Inspect timing | `--dur-fly`, `--dur-back` | `BACK_MS` in `js/site.js` mirrors `--dur-back`; update both |
 | Inspect size | `--inspect-w` | The slot uses `--card-aspect`; on 390 px the veil padding already drops to 0.75rem |
 | Tilt strength | `TILT_X` / `TILT_Y` in `js/site.js` (max ±8° / ±10°) | The sway keyframes carry `--rx/--ry`; the clone copies them |
-| Idle sway | `@keyframes sway` stops and `--sway-angle`, `--sway-shift`, `--sway-time`, `--sway-phase` on each `:nth-child` | Check the hand adds no horizontal overflow and that hover still freezes the pose |
+| Idle sway | `@keyframes sway` stops and `--sway-angle`, `--sway-shift`, `--sway-time`, `--sway-phase` on each `:nth-child` | Check the hand adds no horizontal overflow and that hover still freezes the pose; the clone reads the sway angle in `alignToCard` |
 | Art window ratio | `.card-art { aspect-ratio }` and the screenshot crop | Every card must keep the same window or the cards stop being equal |
 | Add a tool | Copy an `<li class="card" data-card="…">` block, add `--art-…` and `.card[data-card="…"]` | Position in the hand = relevance order; `aria-label` on `.card-hit` |
 | Copy | `index.html` only | Keep one line per tool, around 12 words |
@@ -279,9 +284,6 @@ dark-only palette, the 5:7 card, the order of `Open`/`Download` then `Source`.
 - The tilt is an immediate follow, not an eased one: the sway animates `transform`, so no
   transition can sit on it. Per-frame pointer updates keep it smooth; the return to flat is
   instant.
-- The inspect clone starts within about 2 px of a swaying card: the sway lives in the card's
-  transform and the clone takes the card's box without it, so the first frame can differ by
-  less than the sway amplitude and the flight covers it.
 
 ## 12. Verification
 
