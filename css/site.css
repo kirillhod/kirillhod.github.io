@@ -186,7 +186,9 @@ button:focus-visible {
   flex-direction: column;
   gap: 0.65rem;
   width: var(--card-w);
-  aspect-ratio: var(--card-aspect);
+  /* The card keeps the 5:7 shape as a floor (7/5 of its width, the inverse of
+     --card-aspect) and grows with its content at large text sizes instead of clipping. */
+  min-height: calc(var(--card-w) * 7 / 5);
   padding: 0.9rem 0.9rem 0.8rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
@@ -324,6 +326,7 @@ button:focus-visible {
   position: relative;
   z-index: 2;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.45rem;
   pointer-events: none;
 }

@@ -33,7 +33,12 @@
     node.style.setProperty("--dx", `${from.left + from.width / 2 - (to.left + to.width / 2)}px`);
     node.style.setProperty("--dy", `${from.top + from.height / 2 - (to.top + to.height / 2)}px`);
     node.style.setProperty("--k", String(cardScale));
-    node.style.setProperty("--k1", String(to.width / card.offsetWidth));
+    // Fit the inspect slot on both axes: at large text sizes a card can be taller than the
+    // slot's aspect ratio, and the height must not push it off screen.
+    node.style.setProperty(
+      "--k1",
+      String(Math.min(to.width / card.offsetWidth, to.height / card.offsetHeight))
+    );
     node.style.setProperty("--r0", rotation === "none" ? "0deg" : rotation);
     node.style.setProperty("--rx", style.getPropertyValue("--rx") || "0deg");
     node.style.setProperty("--ry", style.getPropertyValue("--ry") || "0deg");

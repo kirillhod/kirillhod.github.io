@@ -75,8 +75,11 @@ art only, and only real images: no placeholder files, no sprites, no icons.
 - One entry per public tool, ordered by relevance, not alphabetically.
 - An entry holds: a two-digit position (`01`), a kind label (`Web app`, `Blender add-on`),
   the name, a one-line note, and actions. Add an `Open` action only when the tool runs on
-  the web. Label actions by what they open — `Open` for a live tool, `Source` for a
-  repository — and never call a finished tool a demo.
+  the web, and `Download` only when a release ships an archive. Label actions by what they
+  open — `Open` for a live tool, `Download` for a release zip, `Source` for a repository —
+  and never call a finished tool a demo. The one gold action per card is the one that gets
+  the tool: `Open` or `Download`. A `Download` link points at the zip asset of the latest
+  release and moves with the next release.
 - Card art is a real screenshot when the tool has one: a `720 × 450` JPEG cropped to `8 / 5`
   in `assets/`, `alt=""`, filling the window edge to edge. Until then, an inline SVG
   emblem, `aria-hidden`, one emblem per tool, all on the same `120 × 84` viewBox so the
@@ -154,6 +157,7 @@ is committed locally with a factual body.
    repository README.
 3. Give the card its tint in `css/site.css` and fill the art window: a cropped screenshot
    from the repository when one exists (see §4), otherwise a placeholder emblem.
-4. Link the repository, plus the live tool only if it exists and loads.
+4. Link the repository, plus the live tool if it exists and loads, and the zip of the
+   latest release if the add-on ships one.
 5. Give the inspect button an `aria-label` that names the tool.
 6. Run the verification list, then commit.
