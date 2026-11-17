@@ -127,26 +127,31 @@ There is no test suite; verification is manual and must be reported with what wa
 - Commit locally after a coherent, verified change.
 - **Do not push**, add or change remotes, create tags, releases, branches, or PRs. The
   owner pushes.
-- Commit messages: English, imperative, no conventional prefixes (`feat:` etc.), subject
-  plus a short body explaining why and what changed. One coherent change per commit; keep
-  refactors separate from content updates.
+- Commit messages: English, imperative, no conventional prefixes (`feat:` etc.). Subject
+  plus a short body that states what changed and where — the facts, not the intent.
+  Describe the change only: never who asked for it, what was wanted, how it used to feel,
+  or how it was judged ("the owner wants…", "the list read as plain…"). Prefer numbers and
+  file names over adjectives. One coherent change per commit; keep refactors separate from
+  content updates.
 - Never commit `.DS_Store`, `Thumbs.db`, editor folders, logs, or secrets. Check
   `git status` before committing.
-- Do not rewrite history.
+- Do not rewrite history. The one exception is a message-only rewrite of commits that were
+  never pushed, and only when the owner asks for it.
 
 ## 9. Definition of done
 
 A change is done when the page still loads from disk and from Pages, the layout holds at
 narrow widths, keyboard and focus states work, no dependency/build/network was
 added, links still point at real projects, copy matches the repositories, and the change
-is committed locally with a descriptive body.
+is committed locally with a factual body.
 
 ## 10. Adding a project
 
 1. Copy an existing `<li class="card" data-card="…">` block and place it by relevance.
 2. Set the position, the kind label, the name, and a one-line note shortened from the
    repository README.
-3. Give the card its tint in `css/site.css` and draw a placeholder emblem in the art window.
+3. Give the card its tint in `css/site.css` and fill the art window: a cropped screenshot
+   from the repository when one exists (see §4), otherwise a placeholder emblem.
 4. Link the repository, plus the live tool only if it exists and loads.
 5. Give the inspect button an `aria-label` that names the tool.
 6. Run the verification list, then commit.
