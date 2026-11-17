@@ -40,7 +40,8 @@ still use inline SVG emblems. The site is not yet published — the owner pushes
    exist. The site must work identically opened from disk (`file://`) and served from
    Pages. The site is dark-only; every link works offline.
 4. **Relative asset paths** (`css/site.css`, never `/css/site.css`) so the site also works
-   under a subpath.
+   under a subpath. The `og:image` and `twitter:image` URLs are the one exception: link
+   scrapers do not resolve relative paths, so they carry the full site URL.
 5. **External links** carry `rel="noopener noreferrer"` when they open a new context.
    No `target="_blank"` unless the owner asks for it.
 6. **No personal identity on the page.** Do not add the owner's name, photo, bio, role,
@@ -57,7 +58,7 @@ index.html          the table: wordmark, the hand of cards, footer, inspect laye
 css/site.css        tokens, layout, cards, inspect view, responsive rules
 js/site.js          deals a card into the inspect view and back, tilts cards under the pointer
 DESIGN.md           the visual system: palette, type, geometry, motion, change recipes
-assets/             card screenshots, one cropped JPEG per tool
+assets/             card screenshots, one cropped JPEG per tool, plus the social preview
 AGENTS.md           this file
 .nojekyll           disables Jekyll on GitHub Pages
 .gitignore          OS/editor junk, logs, env
@@ -65,7 +66,8 @@ AGENTS.md           this file
 ```
 
 Do not add new directories or build configs for a page this size. `assets/` holds card
-art only, and only real images: no placeholder files, no sprites, no icons.
+art and the one social preview, and only real images: no placeholder files, no sprites,
+no icons.
 
 `css/site.css` is the source of truth for colours, geometry, and timings; `DESIGN.md`
 explains them. When a token, a card size, a breakpoint, or a timing changes, update
@@ -89,6 +91,10 @@ explains them. When a token, a card size, a breakpoint, or a timing changes, upd
   in `assets/`, `alt=""`, filling the window edge to edge. Until then, an inline SVG
   emblem, `aria-hidden`, one emblem per tool, all on the same `120 × 84` viewBox so the
   cards keep their proportions. Both sit in the same fixed window, so the cards stay equal.
+- The social preview is `assets/social-preview.jpg`: a `1200 × 630` JPEG screenshot of the
+  hand, referenced from `og:image` and `twitter:image` by its full URL. Redo it when the
+  cards, their copy, or the fan changes, and keep the `og:image:width` and `:height` in
+  `index.html` matching the file.
 - Describe what the tool does for the user. No superlatives, no marketing voice, no
   invented facts — shorten the repository README.
 - Keep the notes in sync with the repositories; update them when a project's scope
