@@ -1,0 +1,138 @@
+:root {
+  color-scheme: dark light;
+
+  --bg: #0b0d10;
+  --fg: #f5f7fa;
+  --muted: #8b929c;
+  --line: #1e232b;
+  --accent: #6ea8fe;
+  --measure: 44rem;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #fbfbfa;
+    --fg: #14171c;
+    --muted: #61676f;
+    --line: #e4e4e0;
+    --accent: #1a56db;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0 auto;
+  width: 100%;
+  max-width: var(--measure);
+  padding: 3.5rem 1.25rem 2.5rem;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--line);
+  text-underline-offset: 0.2em;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 0.2rem;
+}
+
+.wordmark {
+  margin: 0 0 3rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Projects */
+
+.projects {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.project {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.project-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-decoration: none;
+}
+
+.project-name {
+  font-size: 1.05rem;
+  font-weight: 550;
+}
+
+.project-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.project-main:hover .project-name {
+  color: var(--accent);
+}
+
+.project-extra {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.project-extra:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
+
+.site-footer {
+  margin-top: 3rem;
+  font-size: 0.8rem;
+}
+
+.handle {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.handle:hover {
+  color: var(--fg);
+}
+
+@media (max-width: 26rem) {
+  body {
+    padding-top: 2.5rem;
+  }
+
+  .wordmark {
+    margin-bottom: 2rem;
+  }
+}
