@@ -116,7 +116,9 @@ There is no test suite; verification is manual and must be reported with what wa
 - Check 360 px, 768 px, and 1280 px widths; keyboard-only pass; confirm the palette stays
   dark whatever the system setting is.
 - Open every card: it must fly to the centre, dim the hand, and take focus; `Esc`, the
-  close button, and a click outside must bring it back and return focus to the card.
+  close button, and a click outside must bring it back and return focus to the card. The
+  clone must match the card on the first frame and the slot on the last — same box, same
+  line breaks, only the scale changing — or the flight jumps at both ends.
 - Repeat the pass with JavaScript disabled and with `prefers-reduced-motion` forced.
 - Confirm no console errors, no network requests besides navigation, and that every link
   resolves to a real page.

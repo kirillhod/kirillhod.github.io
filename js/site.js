@@ -22,13 +22,21 @@
     const to = slot.getBoundingClientRect();
     if (!from.width || !to.width) return;
 
-    const cardScale = Number.parseFloat(getComputedStyle(card).scale) || 1;
-    const rotation = getComputedStyle(card).rotate;
+    const style = getComputedStyle(card);
+    const cardScale = Number.parseFloat(style.scale) || 1;
+    const rotation = style.rotate;
 
+    // The clone is laid out at the card's own size and reaches the inspect size by scale,
+    // so the copy keeps the card's line breaks, padding and type.
+    node.style.setProperty("--cw", `${card.offsetWidth}px`);
+    node.style.setProperty("--ch", `${card.offsetHeight}px`);
     node.style.setProperty("--dx", `${from.left + from.width / 2 - (to.left + to.width / 2)}px`);
     node.style.setProperty("--dy", `${from.top + from.height / 2 - (to.top + to.height / 2)}px`);
-    node.style.setProperty("--k", String((card.offsetWidth * cardScale) / to.width));
+    node.style.setProperty("--k", String(cardScale));
+    node.style.setProperty("--k1", String(to.width / card.offsetWidth));
     node.style.setProperty("--r0", rotation === "none" ? "0deg" : rotation);
+    node.style.setProperty("--rx", style.getPropertyValue("--rx") || "0deg");
+    node.style.setProperty("--ry", style.getPropertyValue("--ry") || "0deg");
   };
 
   const openInspect = (card) => {

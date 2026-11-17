@@ -525,15 +525,20 @@ button:focus-visible {
   list-style: none;
 }
 
+/* The clone keeps the card's layout box and only scales, so its text wraps exactly as it
+   does in the hand; a clone laid out at the inspect width would re-flow and read as a
+   different card. js/site.js sets --cw, --ch, --k (hand scale) and --k1 (inspect scale). */
 .veil-card {
   position: absolute;
-  inset: 0;
-  width: auto;
-  height: auto;
-  aspect-ratio: auto;
+  top: 50%;
+  left: 50%;
+  width: var(--cw, 100%);
+  height: var(--ch, 100%);
+  margin: calc(var(--ch, 0px) / -2) 0 0 calc(var(--cw, 0px) / -2);
   translate: var(--dx, 0) var(--dy, 0);
   rotate: var(--r0, 0deg);
-  scale: var(--k, var(--hand-scale));
+  scale: var(--k, 1);
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   box-shadow:
     0 44px 90px -34px #000000f5,
     0 0 0 1px var(--gold-wash-strong),
@@ -541,13 +546,15 @@ button:focus-visible {
   transition:
     translate var(--dur-fly) var(--ease),
     rotate var(--dur-fly) var(--ease),
-    scale var(--dur-fly) var(--ease);
+    scale var(--dur-fly) var(--ease),
+    transform 160ms var(--ease);
 }
 
 .veil.is-open .veil-card {
   translate: 0 0;
   rotate: 0deg;
-  scale: 1;
+  scale: var(--k1, 1);
+  transform: perspective(900px) rotateX(0deg) rotateY(0deg);
 }
 
 .veil-close {
