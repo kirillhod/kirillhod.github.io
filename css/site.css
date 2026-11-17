@@ -43,6 +43,7 @@
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --dur: 0.24s;
   --dur-fly: 0.44s;
+  --dur-back: 0.28s;
 }
 
 *,
@@ -609,6 +610,26 @@ button:focus-visible {
   letter-spacing: 0.16em;
   text-align: center;
   text-transform: uppercase;
+}
+
+/* The frame of the inspect view leaves first: the close button and the hint go on the
+   first frame of the return and the card, scrim and shadow follow in --dur-back. */
+.veil.is-closing .veil-close,
+.veil.is-closing .veil-hint {
+  visibility: hidden;
+  opacity: 0;
+  transition: none;
+}
+
+.veil.is-closing .veil-scrim {
+  transition-duration: var(--dur-back);
+}
+
+.veil.is-closing .veil-card {
+  transition:
+    translate var(--dur-back) var(--ease),
+    rotate var(--dur-back) var(--ease),
+    scale var(--dur-back) var(--ease);
 }
 
 /* Narrow screens: the hand becomes a swipeable row */

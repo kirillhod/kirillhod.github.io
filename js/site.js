@@ -8,7 +8,8 @@
   const slot = document.querySelector(".veil-slot");
   const closeButton = document.querySelector(".veil-close");
 
-  const FLY_MS = 440;
+  // Mirrors --dur-back in css/site.css: the return flight is shorter than the way in.
+  const BACK_MS = 280;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   let inspected = null;
@@ -64,6 +65,7 @@
     table.inert = true;
 
     veil.hidden = false;
+    veil.classList.remove("is-closing");
     // The start position must be in place before the clone is inserted, otherwise its
     // own transition animates it into the hand instead of out of it.
     alignToCard(clone, card);
@@ -86,6 +88,7 @@
 
     // The layout may have changed while the card was open, so re-aim before flying back.
     if (clone) alignToCard(clone, card);
+    veil.classList.add("is-closing");
     veil.classList.remove("is-open");
     hand.classList.remove("is-inspecting");
     table.inert = false;
@@ -93,6 +96,7 @@
     const settle = () => {
       closeTimer = 0;
       veil.hidden = true;
+      veil.classList.remove("is-closing");
       if (clone) {
         clone.remove();
         clone = null;
@@ -106,7 +110,7 @@
       return;
     }
 
-    closeTimer = window.setTimeout(settle, FLY_MS + 60);
+    closeTimer = window.setTimeout(settle, BACK_MS + 60);
   };
 
   hand.addEventListener("click", (event) => {
