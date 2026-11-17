@@ -140,29 +140,37 @@ Measured, for reference:
 | State | What changes |
 |---|---|
 | Rest | Fan: card 1 `-9deg` and 34 px low, card 2 flat, card 3 `+9deg` and 34 px low; hand scale 0.88 |
+| Idle sway | Every card drifts and turns on its own slow path: 0.42–0.6deg of rotation, 1.1–1.5 px of drift, periods of 23 / 29 / 31 s, started from negative delays. The five stops sit at uneven intervals so the motion has no beat. The pose freezes where it is on hover and while a card is inspected, and is gone under reduced motion |
 | Hover (`.hand .card:hover`, hover-capable only) | Rotation to 0, up 14 px, scale +0.025, stronger border, deeper shadow, gold halo, pointer glare on (`::after` opacity 1); the other cards fall to `opacity: 0.84`; `z-index: 6` |
 | Pointer tilt (mouse, pen) | `transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry))` from `js/site.js`: up to `±10deg` around Y and `±8deg` around X, away from the pointer; glare centre follows `--mx/--my` |
 | Finger tilt (touch) | Rides touch events, not pointer events: a phone cancels the pointer stream as soon as it decides the drag is a scroll. After 6 px of movement the card leans under the finger; the anchor moves with the page scroll so the lean does not swing while scrolling; a tap stays flat, and a drag drops the click |
 | Focus-visible | `2px --gold` outline, offset 3 px; the card's hit button puts the ring inside the card (`-4px`) so it follows the rounded edge |
 | Active / pressed | Border to `--line-strong` only — the box must not move, because the flight measures it |
 | Inspecting | `.hand.is-inspecting` drops every card to `opacity: 0.22`; the source card gets `.is-source` (`visibility: hidden`) so the clone is the only visible copy |
-| Disabled motion | `prefers-reduced-motion` removes the deal and all transitions; the inspect open/close still works, instantly |
+| Disabled motion | `prefers-reduced-motion` removes the deal, the sway, and every transition; the inspect open/close still works, instantly |
 
 ## 7. Motion
 
-All motion is CSS transitions plus one keyframe animation; JS only measures and sets custom
-properties. Easing is `--ease: cubic-bezier(0.22, 0.61, 0.36, 1)` unless noted.
+All motion is CSS transitions plus two keyframe animations, `deal` and `sway`; JS only
+measures and sets custom properties. Easing is `--ease: cubic-bezier(0.22, 0.61, 0.36, 1)`
+unless noted.
 
 | Beat | Duration | Notes |
 |---|---|---|
 | Deal | 560 ms | `cubic-bezier(0.2, 0.9, 0.25, 1.04)`, `backwards`; from `translate: -92vw`, `rotate: rot - 18deg`, `scale: hand-scale * 0.9`, opacity 0 → 1 by 35% |
 | Deal stagger | 60 / 170 / 280 ms | `.card:nth-child(1…3)` |
-| Card hover, fan, tilt | 240 ms | `--dur`; `transform` shortens to 90 ms so the tilt tracks the pointer |
+| Card hover and fan | 240 ms | `--dur`; the tilt is not transitioned, the sway carries it |
+| Sway | 23 / 29 / 31 s | `ease-in-out`, infinite, negative delays −7 / −19 / −12 s, stops at 0 / 22 / 47 / 71 / 100 % |
 | Open flight | 440 ms | `--dur-fly`: translate, rotate, scale on the clone; scrim fades in over the same |
 | Close flight | 280 ms | `--dur-back`; deliberately shorter than the opening |
 | Close cleanup | 340 ms | `BACK_MS + 60` in `js/site.js`; `BACK_MS` mirrors `--dur-back` |
 
-Deal is pure CSS, so it runs before JS and never waits for a script.
+Deal is pure CSS, so it runs before JS and never waits for a script. The sway keyframes carry
+the tilt variables (`--rx`, `--ry`), which is what lets the pointer tilt ride on the sway
+instead of being replaced by it; because `transform` is animated, it has no transition, and
+the tilt follows the pointer frame by frame. Pausing the sway (`animation-play-state:
+running, paused`) freezes the pose but keeps the tilt live, which was checked by changing
+`--rx` on a paused card.
 
 ### Inspect flight
 
@@ -216,6 +224,9 @@ Notes:
 - The landscape block is last so it wins over the column rule on short, small screens.
 - The strip has no snap points by design; adding them reintroduces the stall they were meant
   to fix.
+- The sway is transform-only: it changes no card's layout box (368 × 515 stays 368 × 515),
+  adds nothing to the hand's horizontal overflow at 390, 844, and 1280 px, and leaves the
+  strip panning.
 
 ## 9. Accessibility contract
 
@@ -246,7 +257,8 @@ Notes:
 | Deal timing | `@keyframes deal` (560 ms) and the three `animation-delay` values | `prefers-reduced-motion` still removes it |
 | Inspect timing | `--dur-fly`, `--dur-back` | `BACK_MS` in `js/site.js` mirrors `--dur-back`; update both |
 | Inspect size | `--inspect-w` | The slot uses `--card-aspect`; on 390 px the veil padding already drops to 0.75rem |
-| Tilt strength | `TILT_X` / `TILT_Y` in `js/site.js` (max ±8° / ±10°) | `transform` transition 90 ms; the clone copies `--rx/--ry` |
+| Tilt strength | `TILT_X` / `TILT_Y` in `js/site.js` (max ±8° / ±10°) | The sway keyframes carry `--rx/--ry`; the clone copies them |
+| Idle sway | `@keyframes sway` stops and `--sway-angle`, `--sway-shift`, `--sway-time`, `--sway-phase` on each `:nth-child` | Check the hand adds no horizontal overflow and that hover still freezes the pose |
 | Art window ratio | `.card-art { aspect-ratio }` and the screenshot crop | Every card must keep the same window or the cards stop being equal |
 | Add a tool | Copy an `<li class="card" data-card="…">` block, add `--art-…` and `.card[data-card="…"]` | Position in the hand = relevance order; `aria-label` on `.card-hit` |
 | Copy | `index.html` only | Keep one line per tool, around 12 words |
@@ -264,6 +276,12 @@ dark-only palette, the 5:7 card, the order of `Open`/`Download` then `Source`.
   card does not flinch before it flies. On touch the tilt listens to touch events because
   the pointer stream is cancelled once the phone starts scrolling, and a drag that scrolls
   the page keeps leaning the card until the finger lifts.
+- The tilt is an immediate follow, not an eased one: the sway animates `transform`, so no
+  transition can sit on it. Per-frame pointer updates keep it smooth; the return to flat is
+  instant.
+- The inspect clone starts within about 2 px of a swaying card: the sway lives in the card's
+  transform and the clone takes the card's box without it, so the first frame can differ by
+  less than the sway amplitude and the flight covers it.
 
 ## 12. Verification
 
