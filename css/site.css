@@ -677,6 +677,50 @@ button:focus-visible {
   }
 }
 
+/* Phones: no strip at all. The cards sit in one pile, 01 on top, and the two cards behind
+   show a 24 px band with their number, which is enough to tap them open. */
+
+@media (max-width: 30rem) {
+  :root {
+    --card-w: min(76vw, 18rem);
+    --hand-scale: 0.94;
+  }
+
+  .hand-wrap {
+    padding-block: 4.25rem;
+  }
+
+  .hand {
+    padding-inline: 0;
+  }
+
+  .hand .card {
+    margin-inline: 0;
+  }
+
+  .hand .card + .card {
+    margin-left: calc(var(--card-w) * -1);
+  }
+
+  .hand .card:nth-child(1) {
+    --rot: 0deg;
+    --lift: 0px;
+    z-index: 3;
+  }
+
+  .hand .card:nth-child(2) {
+    --rot: -2.5deg;
+    --lift: -24px;
+    z-index: 2;
+  }
+
+  .hand .card:nth-child(3) {
+    --rot: -5deg;
+    --lift: -48px;
+    z-index: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hand .card {
     animation: none;

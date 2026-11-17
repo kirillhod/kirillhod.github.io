@@ -117,9 +117,11 @@ There is no test suite; verification is manual and must be reported with what wa
 
 - Open `index.html` from disk and through a local server (`python -m http.server`).
 - Check 360 px, 768 px, and 1280 px widths; keyboard-only pass; confirm the palette stays
-  dark whatever the system setting is. Below 56 rem the hand is a strip you swipe: the next
-  card must peek in, the strip must reach the last card without snapping back, and the page
-  itself must not scroll sideways.
+  dark whatever the system setting is. Below 30 rem the three cards sit in one pile with no
+  horizontal scroll: 01 on top, the others leaving a 24 px band that names them and opens
+  them. Between 30 and 56 rem the hand is a strip you swipe: the next card must peek in, the
+  strip must reach the last card without snapping back, and the page itself must not scroll
+  sideways.
 - Open every card: it must fly to the centre, dim the hand, and take focus; `Esc`, the
   close button, and a click outside must bring it back and return focus to the card. The
   clone must match the card on the first frame and the slot on the last — same box, same
