@@ -632,43 +632,48 @@ button:focus-visible {
     scale var(--dur-back) var(--ease);
 }
 
-/* Narrow screens: the hand becomes a swipeable row */
+/* Narrow screens: the hand becomes a fan you swipe through. Cards are narrower than the
+   viewport so the next one peeks in with its own tilt, there is no snapping that can stall
+   before the last card, and the pan stays inside the strip. */
 
 @media (max-width: 56rem) {
   :root {
-    --card-w: min(80vw, 20rem);
-    --hand-scale: 0.92;
+    --card-w: min(72vw, 19rem);
+    --hand-scale: 0.94;
   }
 
   .table {
     padding: 1rem 1rem 0.9rem;
   }
 
+  /* The inspect card is wider than the padded area at 1.5rem, which would push it off
+     centre, so the veil gives up some padding on narrow screens. */
+  .veil {
+    padding: 0.75rem;
+  }
+
   .hand-wrap {
-    padding-block: 1.5rem;
-    scroll-snap-type: x mandatory;
+    padding-block: 2.25rem;
+    overscroll-behavior-x: contain;
     scroll-padding-inline: 1rem;
   }
 
+  .hand {
+    padding-inline: 1.25rem;
+  }
+
   .hand .card {
-    margin-inline: 0.4rem;
-    scroll-snap-align: center;
+    margin-inline: -0.65rem;
   }
 
   .hand .card:nth-child(1) {
-    --rot: -2deg;
-    --lift: 0px;
+    --rot: -5deg;
+    --lift: 18px;
   }
 
   .hand .card:nth-child(3) {
-    --rot: 2deg;
-    --lift: 0px;
-  }
-}
-
-@media (max-width: 22rem) {
-  :root {
-    --card-w: 86vw;
+    --rot: 5deg;
+    --lift: 18px;
   }
 }
 

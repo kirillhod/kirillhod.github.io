@@ -176,6 +176,17 @@
     if (event.target.closest("[data-close]")) closeInspect();
   });
 
+  // A phone that rotates or a window that is resized while a card is open needs the clone
+  // re-aimed at the new slot, otherwise it keeps the size it had when it was picked up.
+  let aimFrame = 0;
+  window.addEventListener("resize", () => {
+    if (!inspected || !clone || aimFrame) return;
+    aimFrame = window.requestAnimationFrame(() => {
+      aimFrame = 0;
+      if (inspected && clone) alignToCard(clone, inspected);
+    });
+  });
+
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && inspected) closeInspect();
   });
