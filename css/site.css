@@ -54,6 +54,10 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Android and iOS paint a blue tint over whatever is tapped. The scrim covers the whole
+     screen, so that tint read as the page flashing on every dismiss; the controls show
+     their own pressed state instead. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -71,6 +75,8 @@ body {
 a,
 button {
   color: inherit;
+  /* Skips the 300 ms wait and the double-tap zoom on controls; pinching still zooms. */
+  touch-action: manipulation;
 }
 
 a:focus-visible,
@@ -353,7 +359,8 @@ button:focus-visible {
     background-color var(--dur) var(--ease);
 }
 
-.action:hover {
+.action:hover,
+.action:active {
   border-color: var(--line-strong);
   background: #ffffff0a;
   color: var(--fg);
@@ -365,7 +372,8 @@ button:focus-visible {
   color: var(--gold);
 }
 
-.action-primary:hover {
+.action-primary:hover,
+.action-primary:active {
   border-color: var(--gold);
   background: var(--gold-wash-strong);
   color: var(--gold);
@@ -388,6 +396,11 @@ button:focus-visible {
   outline-offset: -4px;
 }
 
+/* Press feedback for touch: the border only, so the box stays where the flight measured it. */
+.hand .card:active {
+  border-color: var(--line-strong);
+}
+
 .no-js .card-hit {
   display: none;
 }
@@ -406,7 +419,7 @@ button:focus-visible {
     rotate var(--dur) var(--ease),
     translate var(--dur) var(--ease),
     scale var(--dur) var(--ease),
-    transform 140ms var(--ease),
+    transform 90ms var(--ease),
     box-shadow var(--dur) var(--ease),
     border-color var(--dur) var(--ease),
     opacity 0.3s var(--ease);
@@ -584,7 +597,8 @@ button:focus-visible {
     border-color var(--dur) var(--ease);
 }
 
-.veil-close:hover {
+.veil-close:hover,
+.veil-close:active {
   border-color: var(--line-strong);
   color: var(--fg);
 }

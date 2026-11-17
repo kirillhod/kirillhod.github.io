@@ -115,25 +115,49 @@
 
   hand.addEventListener("click", (event) => {
     const hit = event.target.closest(".card-hit");
-    if (hit) openInspect(hit.closest(".card"));
+    if (!hit) return;
+    const card = hit.closest(".card");
+    // A finger that dragged the card to feel the tilt should not also open it.
+    if (card.dataset.dragged) {
+      delete card.dataset.dragged;
+      return;
+    }
+    openInspect(card);
   });
 
   // Cards tilt away from the pointer, like a card pressed at the cursor: the side under
   // the pointer sinks and the opposite edge comes up. The anchor rectangle is taken once
-  // per hover so the tilt does not feed back into its own measurements.
+  // per hover so the tilt does not feed back into its own measurements. On a phone the
+  // same tilt follows the finger, but only in the pile where the hand does not scroll.
   const TILT_X = 8;
   const TILT_Y = 10;
+  const DRAG_PX = 6;
+  const pile = window.matchMedia("(max-width: 30rem)");
 
   hand.querySelectorAll(".card").forEach((card) => {
     let frame = 0;
     let anchor = null;
     let point = null;
+    let pressed = false;
+    let dragged = false;
+    let startX = 0;
+    let startY = 0;
 
     const settle = () => {
       card.style.setProperty("--rx", "0deg");
       card.style.setProperty("--ry", "0deg");
       card.style.setProperty("--mx", "50%");
       card.style.setProperty("--my", "50%");
+    };
+
+    const stop = () => {
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+        frame = 0;
+      }
+      anchor = null;
+      point = null;
+      settle();
     };
 
     const paint = () => {
@@ -154,21 +178,46 @@
       paint();
     });
 
+    card.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" || reducedMotion.matches || !pile.matches) return;
+      pressed = true;
+      dragged = false;
+      startX = event.clientX;
+      startY = event.clientY;
+      anchor = card.getBoundingClientRect();
+      delete card.dataset.dragged;
+    });
+
     card.addEventListener("pointermove", (event) => {
-      if (event.pointerType !== "mouse" || reducedMotion.matches) return;
+      if (reducedMotion.matches) return;
+      if (event.pointerType !== "mouse" && !pressed) return;
       if (!anchor) anchor = card.getBoundingClientRect();
+      // A tap stays flat; only a real drag starts the tilt, so the card does not flicker
+      // before it flies into the inspect view.
+      if (event.pointerType !== "mouse") {
+        if (Math.hypot(event.clientX - startX, event.clientY - startY) <= DRAG_PX) return;
+        dragged = true;
+      }
       point = { x: event.clientX, y: event.clientY };
       if (!frame) frame = window.requestAnimationFrame(paint);
     });
 
-    card.addEventListener("pointerleave", () => {
-      if (frame) {
-        window.cancelAnimationFrame(frame);
-        frame = 0;
-      }
-      anchor = null;
-      point = null;
-      settle();
+    card.addEventListener("pointerup", (event) => {
+      if (event.pointerType === "mouse" || !pressed) return;
+      pressed = false;
+      if (dragged) card.dataset.dragged = "yes";
+      stop();
+    });
+
+    card.addEventListener("pointercancel", () => {
+      if (!pressed) return;
+      pressed = false;
+      stop();
+    });
+
+    card.addEventListener("pointerleave", (event) => {
+      if (event.pointerType !== "mouse") return;
+      stop();
     });
   });
 
