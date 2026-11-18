@@ -59,6 +59,8 @@ css/site.css        tokens, layout, cards, inspect view, responsive rules
 js/site.js          deals a card into the inspect view and back, tilts cards under the pointer
 DESIGN.md           the visual system: palette, type, geometry, motion, change recipes
 assets/             card screenshots, one cropped JPEG per tool, plus the social preview
+robots.txt          allows every crawler and points at the sitemap
+sitemap.xml         the one page, with its last content change
 AGENTS.md           this file
 .nojekyll           disables Jekyll on GitHub Pages
 .gitignore          OS/editor junk, logs, env
@@ -72,6 +74,10 @@ no icons.
 `css/site.css` is the source of truth for colours, geometry, and timings; `DESIGN.md`
 explains them. When a token, a card size, a breakpoint, or a timing changes, update
 `DESIGN.md` in the same commit.
+
+`robots.txt` and `sitemap.xml` live in the root next to `index.html`. The sitemap holds the
+one URL, `https://kirillhod.github.io/`; move its `lastmod` to the day the page's content
+changes, not the layout.
 
 ## 4. Content rules
 
