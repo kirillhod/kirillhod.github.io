@@ -55,8 +55,8 @@ Rules:
 - Card tints are keyed to the tool's own art, not to a palette rotation: a card's tint is
   `--art`, set by `.card[data-card="…"]`, and is used by the art window's glow and its SVG
   `currentColor`. A new tool adds a token and one selector.
-- The favicon (`#45a366`, a plain dot in the `<link rel="icon">` data URI) is a mark, not a
-  palette colour. It does not follow `--gold`.
+- The favicon is the AT monogram: white letters on a `#1c1e22` rounded square, in
+  `assets/favicon.svg`. It is a mark, not a palette colour, and does not follow `--gold`.
 - `meta[name="theme-color"]` must stay equal to `--bg`.
 
 ## 3. Typography
