@@ -56,7 +56,8 @@ Rules:
   `--art`, set by `.card[data-card="…"]`, and is used by the art window's glow and its SVG
   `currentColor`. A new tool adds a token and one selector.
 - The favicon is the AT monogram: white letters on a `#1c1e22` rounded square, in
-  `assets/favicon.svg`. It is a mark, not a palette colour, and does not follow `--gold`.
+  `assets/favicon.svg`, with PNG renders at 32, 48, 96, and 192 px. It is a mark, not a
+  palette colour, and does not follow `--gold`.
 - `meta[name="theme-color"]` must stay equal to `--bg`.
 
 ## 3. Typography
