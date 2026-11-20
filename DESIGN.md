@@ -122,7 +122,9 @@ overflowing hand falls back to its start instead of hiding the first card.
   it edge to edge (`object-fit: cover`, no padding); an SVG emblem sits inside 0.55rem of
   padding on a `120 × 84` viewBox. Both cases keep the window identical, so cards stay equal.
 - `.card-body` is `flex: 1 1 auto` with a column layout: it absorbs the extra height in the
-  stretched landscape row and keeps the actions on the bottom edge.
+  stretched landscape row and keeps the actions on the bottom edge. `.card-copy` holds the
+  one-line note and the longer `.card-detail`; the detail is `display: none` in the hand and
+  absolute in the inspect clone, so swapping the two never changes the card's height.
 - `.card-actions` holds one primary action (`Open` or `Download`, gold) and `Source`. Actions
   are equal-width (`flex: 1 1 0`), minimum height 2rem.
 - `.card-hit` is a transparent full-bleed button over the card, `z-index: 1`. Actions sit at
@@ -132,8 +134,8 @@ Measured, for reference:
 
 | Viewport | Card | Art window | Inspect slot | Clone at rest |
 |---|---|---|---|---|
-| 1280 × 900 | 368 × 515 (scale 0.88) | 338 × 211 | 352 × 493 | 352 × 493 |
-| 390 × 844 | 289 × 404 | 258 × 162 | 352 × 493 | 352 × 493 |
+| 1280 × 900 | 368 × 515 (scale 0.88) | 338 × 211 | 480 × 672 | 480 × 672 |
+| 390 × 844 | 289 × 404 | 258 × 162 | 359 × 502 | 359 × 502 |
 | 844 × 390 | 210 × 249 | 189 × 118 | 218 × 306 | 157 × 306 |
 
 ## 6. States
@@ -203,6 +205,12 @@ line breaks, padding and type survive the trip.
 The clone is positioned at the slot centre with percentage translate
 (`calc(-50% + var(--dx))`), so it needs no known height. `.veil.is-open` moves it to
 `-50% -50%`, rotation 0, scale `--k1`.
+
+The inspect view carries a longer description than the hand. `.card-note` fades out over
+160 ms, then `.card-detail` fades in over 240 ms, both inside the same `.card-copy`; the
+detail is absolute, so the clone's box never reflows and the first-frame match is untouched.
+The way back reverses the order, detail out first, note back in. Landscape phones hide the
+detail and keep the note, because the slot has no vertical room for a paragraph.
 
 The sway turns the card inside its transform, so `alignToCard` reads the angle out of the
 computed matrix and adds it to the fan rotation for `--r0`. Without that the clone would
@@ -277,6 +285,7 @@ Notes:
 | Deal timing | `@keyframes deal` (560 ms) and the three `animation-delay` values | `prefers-reduced-motion` still removes it |
 | Inspect timing | `--dur-fly`, `--dur-back` | `BACK_MS` in `js/site.js` mirrors `--dur-back`; update both |
 | Inspect size | `--inspect-w` | The slot uses `--card-aspect`; on 390 px the veil padding already drops to 0.75rem |
+| Inspect copy | `.card-detail` in `index.html` and its fade in `css/site.css` | The detail is absolute over the note; the text must stay short enough to clear `.card-actions` at 390 px |
 | Tilt strength | `TILT_X` / `TILT_Y` and the `stillTop` falloff in `js/site.js` (max ±8° / ±10°, zero at `.card-actions`) | The sway keyframes carry `--rx/--ry`; the clone copies them |
 | Idle sway | `@keyframes sway` stops and `--sway-angle`, `--sway-shift`, `--sway-time`, `--sway-phase` on each `:nth-child` | Check the hand adds no horizontal overflow and that hover still freezes the pose; the clone reads the sway angle in `alignToCard` |
 | Art window ratio | `.card-art { aspect-ratio }` and the screenshot crop | Every card must keep the same window or the cards stop being equal |
@@ -291,7 +300,8 @@ dark-only palette, the 5:7 card, the order of `Open`/`Download` then `Source`.
 - A very short landscape screen (568 × 320) still scrolls the page about 30 px: three cards
   at a readable size do not fit there.
 - Landscape inspect starts with the note visible, so the clone begins taller than the card
-  and grows out of its centre.
+  and grows out of its centre; the detailed copy is hidden there, since the slot has no
+  room for a paragraph.
 - The tilt is a mouse hover plus a deliberate finger drag; a plain tap never tilts, so the
   card does not flinch before it flies. On touch the tilt listens to touch events because
   the pointer stream is cancelled once the phone starts scrolling, and a drag that scrolls

@@ -103,6 +103,10 @@ changes, not the layout.
   hand, referenced from `og:image` and `twitter:image` by its full URL. Redo it when the
   cards, their copy, or the fan changes, and keep the `og:image:width` and `:height` in
   `index.html` matching the file.
+- Every card keeps its one-line note for the hand and a `card-detail` paragraph for the
+  inspect view: one or two sentences shortened from the repository README, no new claims.
+  The detail is `display: none` on the card and absolute in the clone, so it must stay clear
+  of `.card-actions` at 390 px.
 - Describe what the tool does for the user. No superlatives, no marketing voice, no
   invented facts — shorten the repository README.
 - Keep the notes in sync with the repositories; update them when a project's scope
@@ -147,7 +151,9 @@ There is no test suite; verification is manual and must be reported with what wa
   clone must match the card on the first frame and the slot on the last — same box, same
   line breaks, only the scale changing — or the flight jumps at both ends. The clone reads
   the card's sway rotation as well as its fan angle, so it starts on the card; more than
-  about 2 px of offset is a jump. The close button and the hint leave on the first frame of
+  about 2 px of offset is a jump. In the inspect view the note fades out and the detail
+  fades in while the clone flies; neither may reflow the clone, and the detail must end
+  above `.card-actions` at 390 px. The close button and the hint leave on the first frame of
   the return, and the way back is shorter than the way in.
 - Repeat the pass with JavaScript disabled and with `prefers-reduced-motion` forced.
 - Confirm no console errors, no network requests besides navigation, and that every link

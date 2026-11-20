@@ -35,7 +35,7 @@
   --card-w: clamp(16rem, min(30vw, 52vh), 23rem);
   --card-aspect: 5 / 7;
   --hand-scale: 0.88;
-  --inspect-w: min(22rem, 92vw, 56vh);
+  --inspect-w: min(30rem, 92vw, 56vh);
 
   --radius-card: 0.95rem;
   --radius-ui: 0.4rem;
@@ -326,6 +326,22 @@ button:focus-visible {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* A wrapper so the inspect view can lay the detailed copy over the note without moving
+   anything: the note keeps the height, the detail is absolute. */
+.card-copy {
+  position: relative;
+}
+
+/* The longer description belongs to the inspect view; the hand keeps one line per tool. */
+.card-detail {
+  display: none;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
   text-wrap: pretty;
 }
 
@@ -639,6 +655,55 @@ button:focus-visible {
   transform: perspective(900px) rotateX(0deg) rotateY(0deg);
 }
 
+/* The inspect view swaps the one-line note for the longer copy while the card flies out.
+   The note fades first, the detail follows in the same place, and because the detail is
+   absolute the card does not reflow at either end. */
+.veil-card .card-note {
+  transition:
+    opacity 0.16s var(--ease),
+    visibility 0s linear 0s;
+}
+
+.veil-card .card-detail {
+  display: block;
+  position: absolute;
+  inset: 0 0 auto;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.24s var(--ease) 0.16s,
+    visibility 0s linear 0.4s;
+}
+
+.veil.is-open .veil-card .card-note {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.16s var(--ease),
+    visibility 0s linear 0.16s;
+}
+
+.veil.is-open .veil-card .card-detail {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.24s var(--ease) 0.16s,
+    visibility 0s linear 0.16s;
+}
+
+/* The way back reverses the order so the two texts never sit on top of each other. */
+.veil.is-closing .veil-card .card-note {
+  transition:
+    opacity 0.16s var(--ease) 0.1s,
+    visibility 0s linear 0.1s;
+}
+
+.veil.is-closing .veil-card .card-detail {
+  transition:
+    opacity 0.12s var(--ease),
+    visibility 0s linear 0.12s;
+}
+
 .veil-close {
   position: absolute;
   right: 0;
@@ -834,6 +899,17 @@ button:focus-visible {
     display: none;
   }
 
+  /* A short landscape screen has no room for the long copy, so the note stays visible. */
+  .veil .card-detail {
+    display: none;
+  }
+
+  .veil.is-open .veil-card .card-note {
+    opacity: 1;
+    visibility: visible;
+    transition: none;
+  }
+
   .hand .card:nth-child(1) {
     --rot: -1.5deg;
     --lift: 0px;
@@ -853,6 +929,8 @@ button:focus-visible {
   .hand .card,
   .veil-scrim,
   .veil-card,
+  .card-note,
+  .card-detail,
   .action,
   .veil-close {
     transition: none;
