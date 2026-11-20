@@ -520,12 +520,17 @@ button:focus-visible {
   animation-delay: 280ms, var(--sway-phase);
 }
 
+/* js/site.js mirrors the hover into .is-hover and keeps it until the pointer is well
+   outside the card, so a card that tilts and lifts away from its own edge cannot flicker
+   the hover off and on. */
 @media (hover: hover) {
-  .hand:hover .card:not(:hover) {
+  .hand:hover .card:not(:hover):not(.is-hover),
+  .hand.is-hovering .card:not(.is-hover) {
     opacity: 0.84;
   }
 
-  .hand .card:hover {
+  .hand .card:hover,
+  .hand .card.is-hover {
     rotate: 0deg;
     translate: 0 calc(var(--lift) - 14px);
     scale: calc(var(--hand-scale) + 0.025);
@@ -540,7 +545,8 @@ button:focus-visible {
     z-index: 6;
   }
 
-  .hand .card:hover::after {
+  .hand .card:hover::after,
+  .hand .card.is-hover::after {
     opacity: 1;
   }
 }

@@ -160,6 +160,12 @@
   const TILT_X = 8;
   const TILT_Y = 10;
   const DRAG_PX = 6;
+  // The card lifts and tilts under the pointer, so its edge can slide out from under the
+  // cursor. The hover therefore lives in `.is-hover`, kept until the pointer is this far
+  // outside the rect the hover started on; a plain :hover would drop, snap back, enter and
+  // repeat.
+  const HOVER_HALO = 24;
+  let releaseHover = null;
 
   // True while the hand is a strip that pans: a finger there is scrolling, not tilting.
   const handPans = () => hand.parentElement.scrollWidth > hand.parentElement.clientWidth + 1;
@@ -169,6 +175,9 @@
     let anchor = null;
     let point = null;
     let dragged = false;
+    let tracking = false;
+    let anchorScrollX = 0;
+    let anchorScrollY = 0;
     // Card-relative y where the lean has faded out: the top of the actions row. The
     // buttons must stay where the pointer is aiming, so the card stops turning there.
     let stillTop = 0;
@@ -202,16 +211,27 @@
       stillTop = actions ? actions.getBoundingClientRect().top - rect.top : 0;
     };
 
+    // The page can scroll under a stationary pointer, so the hover rect follows the scroll
+    // without being measured again: a fresh rect would include the tilt it is meant to
+    // judge.
+    const anchorNow = () => ({
+      left: anchor.left - (window.scrollX - anchorScrollX),
+      top: anchor.top - (window.scrollY - anchorScrollY),
+      width: anchor.width,
+      height: anchor.height
+    });
+
     const paint = () => {
       frame = 0;
       if (!point || !anchor) return;
-      const nx = (point.x - anchor.left) / anchor.width - 0.5;
-      const ny = (point.y - anchor.top) / anchor.height - 0.5;
+      const rect = anchorNow();
+      const nx = Math.min(0.5, Math.max(-0.5, (point.x - rect.left) / rect.width - 0.5));
+      const ny = Math.min(0.5, Math.max(-0.5, (point.y - rect.top) / rect.height - 0.5));
       // Full lean at the top edge, none from the actions row down: a pointer on a button
       // must not rotate the card out from under the pointer.
       const reach =
         stillTop > 0
-          ? Math.min(1, Math.max(0, (stillTop - (point.y - anchor.top)) / stillTop))
+          ? Math.min(1, Math.max(0, (stillTop - (point.y - rect.top)) / stillTop))
           : 1;
       card.style.setProperty("--ry", `${(nx * TILT_Y * 2 * reach).toFixed(2)}deg`);
       card.style.setProperty("--rx", `${(-ny * TILT_X * 2 * reach).toFixed(2)}deg`);
@@ -219,15 +239,37 @@
       card.style.setProperty("--my", `${((ny + 0.5) * 100).toFixed(1)}%`);
     };
 
-    // The page can scroll under a finger that stays on the card, so the rect taken at
-    // touchstart is moved by the scroll instead of read again: a fresh rect would include
-    // the tilt and feed back into the next frame.
-    const fingerAnchor = () => ({
-      left: startRect.left - (window.scrollX - startScrollX),
-      top: startRect.top - (window.scrollY - startScrollY),
-      width: startRect.width,
-      height: startRect.height
-    });
+    const release = () => {
+      card.classList.remove("is-hover");
+      if (!hand.querySelector(".card.is-hover")) hand.classList.remove("is-hovering");
+      if (releaseHover === release) releaseHover = null;
+      if (tracking) {
+        document.removeEventListener("pointermove", track);
+        tracking = false;
+      }
+      stop();
+    };
+
+    const insideHalo = (rect, x, y) =>
+      x >= rect.left - HOVER_HALO &&
+      x <= rect.left + rect.width + HOVER_HALO &&
+      y >= rect.top - HOVER_HALO &&
+      y <= rect.top + rect.height + HOVER_HALO;
+
+    // Runs while a card is hovered: the pointer may be inside the halo or outside the card
+    // altogether, and only a move beyond the halo drops the hover.
+    const track = (event) => {
+      if (!anchor) return;
+      if (
+        event.pointerType === "touch" ||
+        !insideHalo(anchorNow(), event.clientX, event.clientY)
+      ) {
+        release();
+        return;
+      }
+      point = { x: event.clientX, y: event.clientY };
+      if (!frame) frame = window.requestAnimationFrame(paint);
+    };
 
     // A tap stays flat, so the card it opens is measured cleanly; once the finger moves
     // past DRAG_PX the card leans under it, and touchend marks the drag to drop the click.
@@ -256,7 +298,9 @@
         const touch = event.touches[0];
         if (Math.hypot(touch.clientX - startX, touch.clientY - startY) <= DRAG_PX) return;
         dragged = true;
-        anchor = fingerAnchor();
+        anchor = startRect;
+        anchorScrollX = startScrollX;
+        anchorScrollY = startScrollY;
         point = { x: touch.clientX, y: touch.clientY };
         if (!frame) frame = window.requestAnimationFrame(paint);
       },
@@ -275,12 +319,23 @@
       stop();
     });
 
-    // Mouse and pen keep the hover tilt, anchored once per hover.
+    // Mouse and pen keep the hover tilt, anchored once per hover. The hover itself is a
+    // class, so the card moving under the pointer cannot toggle it off and on.
     card.addEventListener("pointerenter", (event) => {
       if (event.pointerType === "touch" || reducedMotion.matches) return;
+      if (releaseHover && releaseHover !== release) releaseHover();
+      releaseHover = release;
       anchor = card.getBoundingClientRect();
+      anchorScrollX = window.scrollX;
+      anchorScrollY = window.scrollY;
       measureStillTop(anchor);
       point = { x: event.clientX, y: event.clientY };
+      card.classList.add("is-hover");
+      hand.classList.add("is-hovering");
+      if (!tracking) {
+        tracking = true;
+        document.addEventListener("pointermove", track);
+      }
       paint();
     });
 
@@ -288,16 +343,18 @@
       if (event.pointerType === "touch" || reducedMotion.matches) return;
       if (!anchor) {
         anchor = card.getBoundingClientRect();
+        anchorScrollX = window.scrollX;
+        anchorScrollY = window.scrollY;
         measureStillTop(anchor);
       }
       point = { x: event.clientX, y: event.clientY };
       if (!frame) frame = window.requestAnimationFrame(paint);
     });
+  });
 
-    card.addEventListener("pointerleave", (event) => {
-      if (event.pointerType === "touch") return;
-      stop();
-    });
+  // Leaving the window is the one edge the pointer never reports as a move.
+  document.addEventListener("pointerout", (event) => {
+    if (!event.relatedTarget && releaseHover) releaseHover();
   });
 
   veil.addEventListener("click", (event) => {

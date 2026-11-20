@@ -142,7 +142,7 @@ Measured, for reference:
 |---|---|
 | Rest | Fan: card 1 `-9deg` and 34 px low, card 2 flat, card 3 `+9deg` and 34 px low; hand scale 0.88 |
 | Idle sway | Every card drifts and turns on its own slow path: 1.26–1.8deg of rotation, 3.3–4.5 px of drift, periods of 23 / 29 / 31 s, started from negative delays. The five stops sit at uneven intervals so the motion has no beat. The pose freezes where it is on hover and while a card is inspected, and is gone under reduced motion |
-| Hover (`.hand .card:hover`, hover-capable only) | Rotation to 0, up 14 px, scale +0.025, stronger border, deeper shadow, gold halo, pointer glare on (`::after` opacity 1); the other cards fall to `opacity: 0.84`; `z-index: 6` |
+| Hover (`.hand .card:hover` or `.is-hover`, hover-capable only) | Rotation to 0, up 14 px, scale +0.025, stronger border, deeper shadow, gold halo, pointer glare on (`::after` opacity 1); the other cards fall to `opacity: 0.84`; `z-index: 6`. `js/site.js` mirrors the hover into `.is-hover` and keeps it until the pointer is 24 px away, because the lift itself moves the edge out from under the cursor |
 | Pointer tilt (mouse, pen) | `transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry))` from `js/site.js`: up to `±10deg` around Y and `±8deg` around X, away from the pointer, scaled by height — full at the top edge, zero from the actions row down, so a pointer over the buttons does not move them; glare centre follows `--mx/--my` |
 | Finger tilt (touch) | Rides touch events, not pointer events: a phone cancels the pointer stream as soon as it decides the drag is a scroll. After 6 px of movement the card leans under the finger, with the same height fade as the pointer; the anchor moves with the page scroll so the lean does not swing while scrolling; a tap stays flat, and a drag drops the click |
 | Focus-visible | `2px --gold` outline, offset 3 px; the card's hit button puts the ring inside the card (`-4px`) so it follows the rounded edge |
@@ -177,6 +177,14 @@ The lean is scaled by the pointer's height in the card: 1 at the top edge, falli
 the top of `.card-actions` and staying there. The actions row is measured once per hover or
 touch, from the same rect the tilt is anchored to, so the card cannot chase its own
 measurements. A pointer on a button therefore leaves the card flat and the target still.
+
+Hover is a class, not the live edge. `js/site.js` adds `.is-hover` on entry and keeps it
+until the pointer is 24 px outside the rect captured at entry, the halo. A tilt and the
+14 px lift both move the card's edge, so a plain `:hover` right at that edge would drop,
+snap the card back under the cursor, and enter again — a visible buzz. The class breaks
+that loop; the rect is shifted by the page scroll, and leaving the window releases it. CSS
+must keep its `.is-hover` selectors next to the `:hover` ones or the lift disappears while
+the class holds.
 
 ### Inspect flight
 
@@ -265,6 +273,7 @@ Notes:
 | Card proportion | `--card-aspect`, plus the `7 / 5` in `min-height` and the `/ 1.4` in the landscape width | Four places, or cards stop being 5:7 |
 | Card padding, gap, radii | `.card` padding/gap, `--radius-card`, `--radius-ui`, `.card-art` radius 0.5rem, inner frame `inset` + `calc(radius - 0.3rem)` | The inner frame is derived; keep the subtraction |
 | Fan angle / lift | `--rot` and `--lift` on `:nth-child(1)` and `(3)` in each breakpoint | `.hand` inline padding must keep the overhang inside the scroll area |
+| Hover halo | `HOVER_HALO` in `js/site.js` (24 px) and the `.is-hover` selectors in `css/site.css` | The class drives the lift and the glare; drop either half and the card loses its hover state |
 | Deal timing | `@keyframes deal` (560 ms) and the three `animation-delay` values | `prefers-reduced-motion` still removes it |
 | Inspect timing | `--dur-fly`, `--dur-back` | `BACK_MS` in `js/site.js` mirrors `--dur-back`; update both |
 | Inspect size | `--inspect-w` | The slot uses `--card-aspect`; on 390 px the veil padding already drops to 0.75rem |
