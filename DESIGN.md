@@ -1,5 +1,9 @@
 # DESIGN.md
 
+> **Agent note:** this file is ~21 KB (about 5.3k tokens). Do not read it end to end; jump
+> to the section a task needs (AGENTS.md §3 maps tasks to sections), or grep a token,
+> selector, or timing. `css/site.css` remains the source of truth.
+
 The visual system of **Artwork Tools**: what the page looks like, why, and what has to move
 together when something changes. `css/site.css` is the source of truth for values; this file
 explains the intent and the couplings. If a number here and the CSS disagree, the CSS wins
