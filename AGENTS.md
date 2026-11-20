@@ -12,8 +12,9 @@ only; no framework, no build step, no backend, no accounts, no analytics. The re
 root *is* the site.
 
 **Status:** the card-table layout is in place: the tools are dealt as cards and one card
-opens into a centred inspect view. The palette tool shows a real screenshot; the other two
-still use inline SVG emblems. The site is not yet published — the owner pushes.
+opens into a centred inspect view. The palette tool and NodeAtlas show real screenshots;
+Blender Sprites still uses an inline SVG emblem. The site is live at
+`https://kirillhod.github.io/`; the owner pushes.
 
 **Agreed identifiers** (do not rename without approval):
 
