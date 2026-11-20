@@ -143,8 +143,8 @@ Measured, for reference:
 | Rest | Fan: card 1 `-9deg` and 34 px low, card 2 flat, card 3 `+9deg` and 34 px low; hand scale 0.88 |
 | Idle sway | Every card drifts and turns on its own slow path: 1.26–1.8deg of rotation, 3.3–4.5 px of drift, periods of 23 / 29 / 31 s, started from negative delays. The five stops sit at uneven intervals so the motion has no beat. The pose freezes where it is on hover and while a card is inspected, and is gone under reduced motion |
 | Hover (`.hand .card:hover`, hover-capable only) | Rotation to 0, up 14 px, scale +0.025, stronger border, deeper shadow, gold halo, pointer glare on (`::after` opacity 1); the other cards fall to `opacity: 0.84`; `z-index: 6` |
-| Pointer tilt (mouse, pen) | `transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry))` from `js/site.js`: up to `±10deg` around Y and `±8deg` around X, away from the pointer; glare centre follows `--mx/--my` |
-| Finger tilt (touch) | Rides touch events, not pointer events: a phone cancels the pointer stream as soon as it decides the drag is a scroll. After 6 px of movement the card leans under the finger; the anchor moves with the page scroll so the lean does not swing while scrolling; a tap stays flat, and a drag drops the click |
+| Pointer tilt (mouse, pen) | `transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry))` from `js/site.js`: up to `±10deg` around Y and `±8deg` around X, away from the pointer, scaled by height — full at the top edge, zero from the actions row down, so a pointer over the buttons does not move them; glare centre follows `--mx/--my` |
+| Finger tilt (touch) | Rides touch events, not pointer events: a phone cancels the pointer stream as soon as it decides the drag is a scroll. After 6 px of movement the card leans under the finger, with the same height fade as the pointer; the anchor moves with the page scroll so the lean does not swing while scrolling; a tap stays flat, and a drag drops the click |
 | Focus-visible | `2px --gold` outline, offset 3 px; the card's hit button puts the ring inside the card (`-4px`) so it follows the rounded edge |
 | Active / pressed | Border to `--line-strong` only — the box must not move, because the flight measures it |
 | Inspecting | `.hand.is-inspecting` drops every card to `opacity: 0.22`; the source card gets `.is-source` (`visibility: hidden`) so the clone is the only visible copy |
@@ -172,6 +172,11 @@ instead of being replaced by it; because `transform` is animated, it has no tran
 the tilt follows the pointer frame by frame. Pausing the sway (`animation-play-state:
 running, paused`) freezes the pose but keeps the tilt live, which was checked by changing
 `--rx` on a paused card.
+
+The lean is scaled by the pointer's height in the card: 1 at the top edge, falling to 0 at
+the top of `.card-actions` and staying there. The actions row is measured once per hover or
+touch, from the same rect the tilt is anchored to, so the card cannot chase its own
+measurements. A pointer on a button therefore leaves the card flat and the target still.
 
 ### Inspect flight
 
@@ -263,7 +268,7 @@ Notes:
 | Deal timing | `@keyframes deal` (560 ms) and the three `animation-delay` values | `prefers-reduced-motion` still removes it |
 | Inspect timing | `--dur-fly`, `--dur-back` | `BACK_MS` in `js/site.js` mirrors `--dur-back`; update both |
 | Inspect size | `--inspect-w` | The slot uses `--card-aspect`; on 390 px the veil padding already drops to 0.75rem |
-| Tilt strength | `TILT_X` / `TILT_Y` in `js/site.js` (max ±8° / ±10°) | The sway keyframes carry `--rx/--ry`; the clone copies them |
+| Tilt strength | `TILT_X` / `TILT_Y` and the `stillTop` falloff in `js/site.js` (max ±8° / ±10°, zero at `.card-actions`) | The sway keyframes carry `--rx/--ry`; the clone copies them |
 | Idle sway | `@keyframes sway` stops and `--sway-angle`, `--sway-shift`, `--sway-time`, `--sway-phase` on each `:nth-child` | Check the hand adds no horizontal overflow and that hover still freezes the pose; the clone reads the sway angle in `alignToCard` |
 | Art window ratio | `.card-art { aspect-ratio }` and the screenshot crop | Every card must keep the same window or the cards stop being equal |
 | Add a tool | Copy an `<li class="card" data-card="…">` block, add `--art-…` and `.card[data-card="…"]` | Position in the hand = relevance order; `aria-label` on `.card-hit` |

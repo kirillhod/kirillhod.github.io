@@ -169,6 +169,9 @@
     let anchor = null;
     let point = null;
     let dragged = false;
+    // Card-relative y where the lean has faded out: the top of the actions row. The
+    // buttons must stay where the pointer is aiming, so the card stops turning there.
+    let stillTop = 0;
     let startX = 0;
     let startY = 0;
     let startRect = null;
@@ -192,13 +195,26 @@
       settle();
     };
 
+    // Measured once from the same rect the tilt is anchored to, so the pointer does not
+    // feed back into its own measurements.
+    const measureStillTop = (rect) => {
+      const actions = card.querySelector(".card-actions");
+      stillTop = actions ? actions.getBoundingClientRect().top - rect.top : 0;
+    };
+
     const paint = () => {
       frame = 0;
       if (!point || !anchor) return;
       const nx = (point.x - anchor.left) / anchor.width - 0.5;
       const ny = (point.y - anchor.top) / anchor.height - 0.5;
-      card.style.setProperty("--ry", `${(nx * TILT_Y * 2).toFixed(2)}deg`);
-      card.style.setProperty("--rx", `${(-ny * TILT_X * 2).toFixed(2)}deg`);
+      // Full lean at the top edge, none from the actions row down: a pointer on a button
+      // must not rotate the card out from under the pointer.
+      const reach =
+        stillTop > 0
+          ? Math.min(1, Math.max(0, (stillTop - (point.y - anchor.top)) / stillTop))
+          : 1;
+      card.style.setProperty("--ry", `${(nx * TILT_Y * 2 * reach).toFixed(2)}deg`);
+      card.style.setProperty("--rx", `${(-ny * TILT_X * 2 * reach).toFixed(2)}deg`);
       card.style.setProperty("--mx", `${((nx + 0.5) * 100).toFixed(1)}%`);
       card.style.setProperty("--my", `${((ny + 0.5) * 100).toFixed(1)}%`);
     };
@@ -226,6 +242,7 @@
         startX = touch.clientX;
         startY = touch.clientY;
         startRect = card.getBoundingClientRect();
+        measureStillTop(startRect);
         startScrollX = window.scrollX;
         startScrollY = window.scrollY;
       },
@@ -262,13 +279,17 @@
     card.addEventListener("pointerenter", (event) => {
       if (event.pointerType === "touch" || reducedMotion.matches) return;
       anchor = card.getBoundingClientRect();
+      measureStillTop(anchor);
       point = { x: event.clientX, y: event.clientY };
       paint();
     });
 
     card.addEventListener("pointermove", (event) => {
       if (event.pointerType === "touch" || reducedMotion.matches) return;
-      if (!anchor) anchor = card.getBoundingClientRect();
+      if (!anchor) {
+        anchor = card.getBoundingClientRect();
+        measureStillTop(anchor);
+      }
       point = { x: event.clientX, y: event.clientY };
       if (!frame) frame = window.requestAnimationFrame(paint);
     });
